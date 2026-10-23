@@ -41,7 +41,6 @@ IOServices/AdcH \
 IOServices/PortH \
 IOServices/TimH \
 Middlewares/FreeRTOS \
-Rte \
 SystemServices/Crc \
 SystemServices/EcuM \
 SystemServices/SystemManager \

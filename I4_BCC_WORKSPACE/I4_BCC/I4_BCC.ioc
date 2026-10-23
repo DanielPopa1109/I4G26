@@ -447,3 +447,7 @@ board=NUCLEO-F411RE
 boardIOC=true
 rtos.0.ip=FREERTOS
 isbadioc=false
+
+# G26 legacy board remains the CubeMX baseline.
+# The guarded CAN variant is configured in g26_board.h and CAN_16MHz build configurations.
+# After CubeMX regeneration preserve GPIO guards, BSW scheduling, UART queue and partition-v2 linker scripts.

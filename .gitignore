@@ -1,0 +1,4 @@
+codex_credentials.env
+.build-deps/
+build/
+__pycache__/

@@ -10,6 +10,7 @@
 ******************************************/
 #include "Std_Types.h"
 #include "gpio.h"
+#include "g26_board.h"
 /*****************************************
 *		END OF INCLUDE PATHS		     *
 ******************************************/
@@ -17,17 +18,17 @@
 *		DEFINES					 		 *
 ******************************************/
 /* Port define value */
-#define CENLOC_DOOR_LED_PORT 					GPIOA
+#define CENLOC_DOOR_LED_PORT 					(G26_MCP2515_REWIRED_BOARD ? GPIOC : GPIOA)
 /* Pin define value */
-#define CENLOC_DOOR_LED_PIN 					GPIO_PIN_6
+#define CENLOC_DOOR_LED_PIN 					(G26_MCP2515_REWIRED_BOARD ? GPIO_PIN_11 : GPIO_PIN_6)
 /* Port define value */
 #define CENLOC_BUZZER_PORT 						GPIOB
 /* Pin define value */
 #define CENLOC_BUZZER_PIN						GPIO_PIN_2
 /* Port define value */
-#define EXTLIGHTS_LOWBEAM_PORT 					GPIOA
+#define EXTLIGHTS_LOWBEAM_PORT 					(G26_MCP2515_REWIRED_BOARD ? GPIOC : GPIOA)
 /* Pin define value */
-#define EXTLIGHTS_LOWBEAM_PIN 					GPIO_PIN_5
+#define EXTLIGHTS_LOWBEAM_PIN 					(G26_MCP2515_REWIRED_BOARD ? GPIO_PIN_10 : GPIO_PIN_5)
 /* Port define value */
 #define EXTLIGHTS_HIGHBEAM_PORT 				GPIOA
 /* Pin define value */
@@ -53,9 +54,9 @@
 /* Pin define value */
 #define EXTLIGHTS_REARFOGLIGHT_PIN 				GPIO_PIN_1
 /* Port define value */
-#define EXTLIGHTS_BRAKELIGHT_PORT 				GPIOA
+#define EXTLIGHTS_BRAKELIGHT_PORT 				(G26_MCP2515_REWIRED_BOARD ? GPIOC : GPIOA)
 /* Pin define value */
-#define EXTLIGHTS_BRAKELIGHT_PIN 				GPIO_PIN_7
+#define EXTLIGHTS_BRAKELIGHT_PIN 				(G26_MCP2515_REWIRED_BOARD ? GPIO_PIN_12 : GPIO_PIN_7)
 /* Port define value */
 #define EXTLIGHTS_REVERSELIGHT_PORT 			GPIOB
 /* Pin define value */

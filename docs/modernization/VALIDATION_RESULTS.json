@@ -1,0 +1,533 @@
+{
+  "recorded_utc": "2026-10-19T11:17:50.400378+00:00",
+  "compiler": "arm-none-eabi-gcc.exe (Arm GNU Toolchain 13.3.Rel1 (Build arm-13.24)) 13.3.1 20240614",
+  "dependencies": {
+    "STM32CubeF4": "v1.27.1 official ST sources",
+    "native_compiler": "Zig 0.13.0 cc"
+  },
+  "scope": "GNU Cortex-M4 builds from Cube project source mappings; no CubeIDE GUI or hardware execution",
+  "source_fingerprint": {
+    "files": 180,
+    "sha256": "8e2f9c9238157f8ee4bbf755ba942c860a6321963807105af6c62e97e485a637"
+  },
+  "artifacts": [
+    {
+      "variant": "legacy",
+      "project": "app",
+      "result": "PASS",
+      "sources": 92,
+      "memory_bytes": {
+        "RAM": 37448,
+        "FLASH": 51393
+      },
+      "files": {
+        ".elf": {
+          "path": "build/legacy/app/G26_APP.elf",
+          "bytes": 2115972,
+          "sha256": "82522f3b970d41fbf8f4b077386e57c3455a39c809f120e6a2d6e6f5ce07ede1"
+        },
+        ".bin": {
+          "path": "build/legacy/app/G26_APP.bin",
+          "bytes": 51393,
+          "sha256": "0afef812d55c260f74f2845f0a1ffad5a875bca939a411f0465e81c731f3111c"
+        },
+        ".hex": {
+          "path": "build/legacy/app/G26_APP.hex",
+          "bytes": 144629,
+          "sha256": "948b541631755978e15b8efc964908a3ece8ed1f1bb8fdb2b68dd2725bf1186b"
+        }
+      },
+      "flash_helpers": {
+        "result": "PASS",
+        "helpers": [
+          "waitReady",
+          "unlock",
+          "flushCaches",
+          "eraseRam",
+          "programRam"
+        ],
+        "branches_checked": 11,
+        "relocations_checked": 0
+      }
+    },
+    {
+      "variant": "legacy",
+      "project": "fbl",
+      "result": "PASS",
+      "sources": 36,
+      "memory_bytes": {
+        "UPDATER": 70380,
+        "UPDSTACK": 0,
+        "RAM": 3088,
+        "FLASH": 11816
+      },
+      "files": {
+        ".elf": {
+          "path": "build/legacy/fbl/G26_FBL.elf",
+          "bytes": 1201068,
+          "sha256": "6758716e075ce8d23acf63023624d6f5685bac32b917d0c8201d5f499ec1fd4c"
+        },
+        ".bin": {
+          "path": "build/legacy/fbl/G26_FBL.bin",
+          "bytes": 11816,
+          "sha256": "436113288c3d5be22a4626063de1e11a1988046fea6b56984ade0c922600ce30"
+        },
+        ".hex": {
+          "path": "build/legacy/fbl/G26_FBL.hex",
+          "bytes": 32548,
+          "sha256": "7272a95a0bf98344ff30ea15cc0332fd88d1153aa84c46e5ee4c2d8c84c0434d"
+        }
+      },
+      "flash_helpers": {
+        "result": "PASS",
+        "helpers": [
+          "wait_ready",
+          "unlock_flash",
+          "flush_caches",
+          "erase_sector",
+          "program_bytes"
+        ],
+        "branches_checked": 11,
+        "relocations_checked": 0
+      },
+      "updater_closure": {
+        "relocations_checked": 167,
+        "sram_code_data_bytes": 4292,
+        "sram_bss_bytes": 66088,
+        "sram_end": "0x200112ec",
+        "load_address": "0x8001c00",
+        "result": "PASS"
+      }
+    },
+    {
+      "variant": "can",
+      "project": "app",
+      "result": "PASS",
+      "sources": 92,
+      "memory_bytes": {
+        "RAM": 37576,
+        "FLASH": 53341
+      },
+      "files": {
+        ".elf": {
+          "path": "build/can/app/G26_APP.elf",
+          "bytes": 2181224,
+          "sha256": "b77af37e5827d53273ba2db0d11f5f7397a91b9cb1f6e7eeaaf5958a756253dc"
+        },
+        ".bin": {
+          "path": "build/can/app/G26_APP.bin",
+          "bytes": 53341,
+          "sha256": "ba673fc2102f95ee3cbf9e10fdbdd664bbcf4a0c3bccde93a59373ded09c4dfb"
+        },
+        ".hex": {
+          "path": "build/can/app/G26_APP.hex",
+          "bytes": 150111,
+          "sha256": "7af0945cf35e1ae9865ef35359924c9cdb42e5e0138565fe2cb6ef1b2c72ddfc"
+        }
+      },
+      "flash_helpers": {
+        "result": "PASS",
+        "helpers": [
+          "waitReady",
+          "unlock",
+          "flushCaches",
+          "eraseRam",
+          "programRam"
+        ],
+        "branches_checked": 11,
+        "relocations_checked": 0
+      }
+    },
+    {
+      "variant": "can",
+      "project": "fbl",
+      "result": "PASS",
+      "sources": 36,
+      "memory_bytes": {
+        "UPDATER": 70528,
+        "UPDSTACK": 0,
+        "RAM": 3088,
+        "FLASH": 17104
+      },
+      "files": {
+        ".elf": {
+          "path": "build/can/fbl/G26_FBL.elf",
+          "bytes": 1225524,
+          "sha256": "bbea64ade7e9c4a46fea6b570ecc61c0ec544866543b0b574c18acce3c5cdbfa"
+        },
+        ".bin": {
+          "path": "build/can/fbl/G26_FBL.bin",
+          "bytes": 17104,
+          "sha256": "4537e1eae615c0a766df0fc77e2c3a4035b254e43e0d67a366ba7bb0f605be26"
+        },
+        ".hex": {
+          "path": "build/can/fbl/G26_FBL.hex",
+          "bytes": 47639,
+          "sha256": "d4d90dce03121ec5d123a1e9118b3d365e5149b793321726c4b80586523dc8f5"
+        }
+      },
+      "flash_helpers": {
+        "result": "PASS",
+        "helpers": [
+          "wait_ready",
+          "unlock_flash",
+          "flush_caches",
+          "erase_sector",
+          "program_bytes"
+        ],
+        "branches_checked": 11,
+        "relocations_checked": 0
+      },
+      "updater_closure": {
+        "relocations_checked": 169,
+        "sram_code_data_bytes": 4440,
+        "sram_bss_bytes": 66088,
+        "sram_end": "0x20011380",
+        "load_address": "0x8003000",
+        "result": "PASS"
+      }
+    },
+    {
+      "variant": "updater",
+      "project": "fbl",
+      "result": "PASS",
+      "sources": 36,
+      "memory_bytes": {
+        "UPDATER": 70528,
+        "UPDSTACK": 0,
+        "RAM": 3088,
+        "FLASH": 17616
+      },
+      "files": {
+        ".elf": {
+          "path": "build/updater/fbl/G26_FBL.elf",
+          "bytes": 1230684,
+          "sha256": "33d8fe77059782b4467738651a6b8d73639de235000339506fbf1168a1f297ed"
+        },
+        ".bin": {
+          "path": "build/updater/fbl/G26_FBL.bin",
+          "bytes": 17616,
+          "sha256": "1363d6081c3fea8448b79c7863e482f9d05a5306b38d3f9fa16d180daefbe25a"
+        },
+        ".hex": {
+          "path": "build/updater/fbl/G26_FBL.hex",
+          "bytes": 48989,
+          "sha256": "249772173a38f3bf3f498a4f6983cf0df9ee84ba47d334e0c2966e5d43578fa1"
+        }
+      },
+      "flash_helpers": {
+        "result": "PASS",
+        "helpers": [
+          "wait_ready",
+          "unlock_flash",
+          "flush_caches",
+          "erase_sector",
+          "program_bytes"
+        ],
+        "branches_checked": 11,
+        "relocations_checked": 0
+      },
+      "updater_closure": {
+        "relocations_checked": 169,
+        "sram_code_data_bytes": 4440,
+        "sram_bss_bytes": 66088,
+        "sram_end": "0x20011380",
+        "load_address": "0x8003200",
+        "result": "PASS"
+      }
+    },
+    {
+      "variant": "legacy-debug",
+      "project": "app",
+      "result": "PASS",
+      "sources": 92,
+      "memory_bytes": {
+        "RAM": 37512,
+        "FLASH": 86936
+      },
+      "files": {
+        ".elf": {
+          "path": "build/legacy-debug/app/G26_APP.elf",
+          "bytes": 1899056,
+          "sha256": "d66ce836534135e36c66e483ad9ee632c3466e50013c474d445463c0cf1072a2"
+        },
+        ".bin": {
+          "path": "build/legacy-debug/app/G26_APP.bin",
+          "bytes": 86936,
+          "sha256": "5ea603ccb4a70d4eb41927c6a381c087e66d2b349d2c550603fcfddfa161ac87"
+        },
+        ".hex": {
+          "path": "build/legacy-debug/app/G26_APP.hex",
+          "bytes": 244605,
+          "sha256": "8fe8be5e4a038f00d33e9a803e8800b26abe44697ded64dfb0530f0d26b22cb4"
+        }
+      },
+      "flash_helpers": {
+        "result": "PASS",
+        "helpers": [
+          "waitReady",
+          "unlock",
+          "flushCaches",
+          "eraseRam",
+          "programRam"
+        ],
+        "branches_checked": 11,
+        "relocations_checked": 0
+      }
+    },
+    {
+      "variant": "legacy-debug",
+      "project": "fbl",
+      "result": "PASS",
+      "sources": 36,
+      "memory_bytes": {
+        "UPDATER": 70400,
+        "UPDSTACK": 0,
+        "RAM": 3088,
+        "FLASH": 22588
+      },
+      "files": {
+        ".elf": {
+          "path": "build/legacy-debug/fbl/G26_FBL.elf",
+          "bytes": 1142752,
+          "sha256": "0e324c80da37f8f3e653a0e0870e8e0b2ce9aa18d396982f7a9c2cde1646845e"
+        },
+        ".bin": {
+          "path": "build/legacy-debug/fbl/G26_FBL.bin",
+          "bytes": 22588,
+          "sha256": "575f3f4f312b70ed96af703bc0c7f025c8b0390193cf83c4538ffdade62e4d3b"
+        },
+        ".hex": {
+          "path": "build/legacy-debug/fbl/G26_FBL.hex",
+          "bytes": 63246,
+          "sha256": "c96c22eacc52eda7547b3018191c0ba9e1e541a10ea53bebb380b6b1ccb6d521"
+        }
+      },
+      "flash_helpers": {
+        "result": "PASS",
+        "helpers": [
+          "wait_ready",
+          "unlock_flash",
+          "flush_caches",
+          "erase_sector",
+          "program_bytes"
+        ],
+        "branches_checked": 11,
+        "relocations_checked": 0
+      },
+      "updater_closure": {
+        "relocations_checked": 161,
+        "sram_code_data_bytes": 4312,
+        "sram_bss_bytes": 66088,
+        "sram_end": "0x20011300",
+        "load_address": "0x8004600",
+        "result": "PASS"
+      }
+    },
+    {
+      "variant": "can-debug",
+      "project": "app",
+      "result": "PASS",
+      "sources": 92,
+      "memory_bytes": {
+        "RAM": 37640,
+        "FLASH": 90164
+      },
+      "files": {
+        ".elf": {
+          "path": "build/can-debug/app/G26_APP.elf",
+          "bytes": 1950540,
+          "sha256": "4b553fc749e44a715d0d4e90ebd6807a1105705d27d4eeab804714f9a9aeb47e"
+        },
+        ".bin": {
+          "path": "build/can-debug/app/G26_APP.bin",
+          "bytes": 90164,
+          "sha256": "78ef4296a0b3e413c463c6fd9f14144caed5b4bcc92cf542b7313005808c7dcd"
+        },
+        ".hex": {
+          "path": "build/can-debug/app/G26_APP.hex",
+          "bytes": 253674,
+          "sha256": "bf269a1121c858bf2e3ae09fc82adc5dfd1f05ffeb386c245cfa0e6ed96a876b"
+        }
+      },
+      "flash_helpers": {
+        "result": "PASS",
+        "helpers": [
+          "waitReady",
+          "unlock",
+          "flushCaches",
+          "eraseRam",
+          "programRam"
+        ],
+        "branches_checked": 11,
+        "relocations_checked": 0
+      }
+    },
+    {
+      "variant": "can-debug",
+      "project": "fbl",
+      "result": "PASS",
+      "sources": 36,
+      "memory_bytes": {
+        "UPDATER": 70540,
+        "UPDSTACK": 0,
+        "RAM": 3088,
+        "FLASH": 25308
+      },
+      "files": {
+        ".elf": {
+          "path": "build/can-debug/fbl/G26_FBL.elf",
+          "bytes": 1149600,
+          "sha256": "c0ada4d8962b03fff19e2f327b8b796d71ff9bc7d3267eb0658ce6d414ff31c0"
+        },
+        ".bin": {
+          "path": "build/can-debug/fbl/G26_FBL.bin",
+          "bytes": 25308,
+          "sha256": "a636bd24c6b750652b5e9512beb562000c245d8dcb645bff23389e6d5833ea11"
+        },
+        ".hex": {
+          "path": "build/can-debug/fbl/G26_FBL.hex",
+          "bytes": 70250,
+          "sha256": "c5bf1126961aba2169b5a73640cfd6f1cd443d64c247e3caed6e3737203aff63"
+        }
+      },
+      "flash_helpers": {
+        "result": "PASS",
+        "helpers": [
+          "wait_ready",
+          "unlock_flash",
+          "flush_caches",
+          "erase_sector",
+          "program_bytes"
+        ],
+        "branches_checked": 11,
+        "relocations_checked": 0
+      },
+      "updater_closure": {
+        "relocations_checked": 163,
+        "sram_code_data_bytes": 4452,
+        "sram_bss_bytes": 66088,
+        "sram_end": "0x2001138c",
+        "load_address": "0x8005000",
+        "result": "PASS"
+      }
+    },
+    {
+      "variant": "updater-debug",
+      "project": "fbl",
+      "result": "PASS",
+      "sources": 36,
+      "memory_bytes": {
+        "UPDATER": 70540,
+        "UPDSTACK": 0,
+        "RAM": 3088,
+        "FLASH": 26332
+      },
+      "files": {
+        ".elf": {
+          "path": "build/updater-debug/fbl/G26_FBL.elf",
+          "bytes": 1154160,
+          "sha256": "b88ff4ac677065da71340600eb50f14dced1aa61c15303601835d0654f156cc8"
+        },
+        ".bin": {
+          "path": "build/updater-debug/fbl/G26_FBL.bin",
+          "bytes": 26332,
+          "sha256": "8433b53156b9abc23a7f88aea9cf6e622be3febe5486cc681759644420823596"
+        },
+        ".hex": {
+          "path": "build/updater-debug/fbl/G26_FBL.hex",
+          "bytes": 72516,
+          "sha256": "57aef0f42b1ef01b05a34d71defd48cab7e5b677a86b94957ff5d3ca86d2ddc0"
+        }
+      },
+      "flash_helpers": {
+        "result": "PASS",
+        "helpers": [
+          "wait_ready",
+          "unlock_flash",
+          "flush_caches",
+          "erase_sector",
+          "program_bytes"
+        ],
+        "branches_checked": 11,
+        "relocations_checked": 0
+      },
+      "updater_closure": {
+        "relocations_checked": 163,
+        "sram_code_data_bytes": 4452,
+        "sram_bss_bytes": 66088,
+        "sram_end": "0x2001138c",
+        "load_address": "0x8005400",
+        "result": "PASS"
+      }
+    }
+  ],
+  "native_suites": [
+    {
+      "suite": "core",
+      "result": "PASS",
+      "assertions_enabled": true,
+      "compiler": [
+        "D:\\GitHub_Repos\\G26\\.build-deps\\host\\ziglang\\zig.exe",
+        "cc"
+      ],
+      "executable_sha256": "c4b7641d33e20b037bfac6acab36e19e6252094903edf8f2ff5fc4dd6c18dc3f",
+      "output": "PASS resident FBL: actual linked APP binary UDS erase/download/transfer/duplicate blocks/CRC/commit/validation\n"
+    },
+    {
+      "suite": "bsw",
+      "result": "PASS",
+      "assertions_enabled": true,
+      "compiler": [
+        "D:\\GitHub_Repos\\G26\\.build-deps\\host\\ziglang\\zig.exe",
+        "cc"
+      ],
+      "executable_sha256": "2c2f315ad9f9dd7a4a5c1584f0548361202337c35551ee15138ee2ca05a91130",
+      "output": "PASS persistence: defaults, ReadAll/WriteAll, DEM restoration, CRC rejection, interrupted writes, journal rotation, deduplication, protected partitions and flash errors\nPASS DEM: debouncing, confirmation, operation cycles/aging, snapshots, extended data, filtering, DTC setting and persistent-clear failure rollback\nPASS communication: filtering, physical confirmations, bus-off, SF/FF/CF/FC, BS/STmin, sequence/timeouts, COM deadlines, NM3 and diagnostic gating\nPASS diagnostics: sessions/S3, TesterPresent, multi-frame DID/snapshot, NRCs, DTC/ClearDTC persistence, communication control, asynchronous RID/P2/P2* and reset after TX\nPASS long erase: active diagnostic journal rotation waits for physical NRC78 confirmation\n"
+    },
+    {
+      "suite": "ram_updater",
+      "result": "PASS",
+      "assertions_enabled": true,
+      "compiler": [
+        "D:\\GitHub_Repos\\G26\\.build-deps\\host\\ziglang\\zig.exe",
+        "cc"
+      ],
+      "executable_sha256": "69b12e2458982f0bd8360bfe69aad744e1d2380151e538bb94d204de86369d0a",
+      "output": "RAM updater: actual linked FBL binary replacement PASS\nRAM updater: PASS full-image SF/FF/CF/FC, replacement/CRC/readback, vectors-last, retransmission, invalid vectors/ranges/BSC, timeout/interruption, erase/program/readback/TX failures and confirmed reset\n"
+    },
+    {
+      "suite": "command_rx",
+      "result": "PASS",
+      "assertions_enabled": true,
+      "compiler": [
+        "D:\\GitHub_Repos\\G26\\.build-deps\\host\\ziglang\\zig.exe",
+        "cc"
+      ],
+      "executable_sha256": "00bf09aefa7b129c4c6f3b9fbebafa423bbdf61cb0b0a138c6f827cdb6fc02c6",
+      "output": "PASS UART: bounded decimal parsing, invalid/overlong input, FIFO ownership, one-shot consumption and queue overflow\n"
+    }
+  ],
+  "gates": [
+    {
+      "command": "python Modernization/tests/check_source_integration.py",
+      "result": "PASS",
+      "output": "PASS source integration: independent projects, every BSW source, exclusion gates, local MCAL copies, board interlocks, scheduling and partition bounds\n"
+    },
+    {
+      "command": "python Modernization/tests/test_ram_checker.py",
+      "result": "PASS",
+      "output": "PASS ELF closure gate: injected erased-Flash dependency rejected\n"
+    }
+  ],
+  "hardware_verified": false,
+  "integration_ready": false,
+  "software_deployed": false,
+  "limitations": [
+    "Board wiring/oscillator and recovery unavailable",
+    "External ZGW/FCD target configuration pending",
+    "Single-bank erase timing and application regression require bench tests",
+    "RWX linker segments and legacy/vendor compiler warnings remain",
+    "No physical flashing, reset, option-byte changes, deployment, commit or push performed"
+  ]
+}

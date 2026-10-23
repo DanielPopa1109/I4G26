@@ -72,11 +72,8 @@
 *		VARIABLES					 	 *
 ******************************************/
 /* Data buffer for bluetooth communication through UART. */
-EXTERN uint8 Btc_DataBuffer[BTC_BUFFER_SIZE];
 /* UART data received from bluetooth module. */
-EXTERN uint8 Btc_RxData;
 /* Counter for data length. */
-EXTERN uint8 Btc_RxCount;
 /* Bluetooth command converted into uint8. */
 EXTERN uint8 Btc_ReceivedDataOnBluetooth;
 /* Auxiliary variable used for bluetooth command. */

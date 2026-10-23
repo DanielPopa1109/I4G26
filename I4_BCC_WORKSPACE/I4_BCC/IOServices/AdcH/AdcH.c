@@ -8,7 +8,7 @@
 *		INCLUDE PATHS					 *
 ******************************************/
 #include "AdcH.h"
-#include "Rte.h"
+#include "App_Dependencies.h"
 /*****************************************
 *		END OF INCLUDE PATHS		     *
 ******************************************/
@@ -45,9 +45,9 @@ VOID HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc);
 ************************************************************************************/
 VOID HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
 {
-	if(Rte_P_Os_OsPort_Os_Counter % 200 == 0)
+	if(Os_Counter % 200 == 0)
 	{
-		Rte_Write_SenCtrl_SenCtrlPort_SenCtrl_MeasuredValues(Adc_ChannelOne_Buffer);
+		do { SenCtrl_MeasuredValues[0] = Adc_ChannelOne_Buffer[0]; SenCtrl_MeasuredValues[1] = Adc_ChannelOne_Buffer[1]; } while (0);
 	}
 	else
 	{

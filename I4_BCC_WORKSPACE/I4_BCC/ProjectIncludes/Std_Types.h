@@ -48,6 +48,12 @@ typedef uint16_t uint16;
 typedef uint32_t uint32;
 /* Standard data type */
 typedef uint8 StdReturnType;
+typedef uint8 Std_ReturnType;
+typedef int8_t sint8;
+typedef int16_t sint16;
+typedef uint8 boolean;
+#define TRUE 1U
+#define FALSE 0U
 /*****************************************
 *		END OF VARIABLES				 *
 ******************************************/

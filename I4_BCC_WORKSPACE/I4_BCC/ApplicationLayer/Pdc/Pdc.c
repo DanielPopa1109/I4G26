@@ -10,7 +10,7 @@
 #include "PortH.h"
 #include "SystemManager.h"
 #include "TimH.h"
-#include "Rte.h"
+#include "App_Dependencies.h"
 /*****************************************
 *		END OF INCLUDE PATHS		     *
 ******************************************/
@@ -96,7 +96,7 @@ VOID Pdc_MainFunction()
 VOID Pdc_Rear_ProcessData()
 {
 	/* Store the distance measured. */
-	Pdc_Rear_Distance = (3 * Rte_P_Tim_TimPort_Tim5_CalculatedDistance_ChannelFour) / 4;
+	Pdc_Rear_Distance = (3 * Tim5_CalculatedDistance_ChannelFour) / 4;
 	/* Trigger the buzzer according to the distance measured. */
 	if(Pdc_Rear_Distance <= PDC_MAX_DISTANCE)
 	{
@@ -109,8 +109,8 @@ VOID Pdc_Rear_ProcessData()
 
 	if(Pdc_Rear_Distance >= PDC_MAX_DISTANCE)
 	{
-		Rte_Call_Gpio_R_GpioPort_HAL_GPIO_WritePin(PDCR_BUZZER_PORT, PDCR_BUZZER_PIN, STD_LOW);
-		Rte_Call_OsTimer_R_OsTimerPort_OsTimerStop(Os_PdcR_Buzzer_TimerHandle);
+		HAL_GPIO_WritePin(PDCR_BUZZER_PORT, PDCR_BUZZER_PIN, STD_LOW);
+		osTimerStop(Os_PdcR_Buzzer_TimerHandle);
 		PdcR_DistanceRange = 0;
 	}
 	else
@@ -128,7 +128,7 @@ VOID Pdc_Rear_ProcessData()
 VOID Pdc_Front_ProcessData()
 {
 	/* Store the distance measured. */
-	Pdc_Front_Distance = (3 * Rte_P_Tim_TimPort_Tim5_CalculatedDistance_ChannelThree) / 4;
+	Pdc_Front_Distance = (3 * Tim5_CalculatedDistance_ChannelThree) / 4;
 	/* Trigger the buzzer according to the distance measured. */
 	if(Pdc_Front_Distance <= PDC_MAX_DISTANCE)
 	{
@@ -141,8 +141,8 @@ VOID Pdc_Front_ProcessData()
 
 	if(Pdc_Front_Distance >= PDC_MAX_DISTANCE)
 	{
-		Rte_Call_Gpio_R_GpioPort_HAL_GPIO_WritePin(PDCF_BUZZER_PORT, PDCF_BUZZER_PIN, STD_LOW);
-		Rte_Call_OsTimer_R_OsTimerPort_OsTimerStop(Os_PdcF_Buzzer_TimerHandle);
+		HAL_GPIO_WritePin(PDCF_BUZZER_PORT, PDCF_BUZZER_PIN, STD_LOW);
+		osTimerStop(Os_PdcF_Buzzer_TimerHandle);
 		PdcF_DistanceRange = 0;
 	}
 	else
@@ -159,25 +159,25 @@ VOID Pdc_Front_ProcessData()
 ************************************************************************************/
 VOID Pdc_Rear_TriggerBuzzer()
 {
-	if(Rte_Call_Os_R_OsPort_OsTimerIsRunning(Os_PdcR_Buzzer_TimerHandle) == 0)
+	if(osTimerIsRunning(Os_PdcR_Buzzer_TimerHandle) == 0)
 	{
 		switch(PdcR_DistanceRange)
 		{
 			case 1:
 				PdcR_DistanceRange = 0;
-				Rte_Call_OsTimer_R_OsTimerPort_OsTimerStart(Os_PdcR_Buzzer_TimerHandle, PDC_BUZZER_PERIOD_ONE);
+				osTimerStart(Os_PdcR_Buzzer_TimerHandle, PDC_BUZZER_PERIOD_ONE);
 				break;
 			case 2:
 				PdcR_DistanceRange = 0;
-				Rte_Call_OsTimer_R_OsTimerPort_OsTimerStart(Os_PdcR_Buzzer_TimerHandle, PDC_BUZZER_PERIOD_TWO);
+				osTimerStart(Os_PdcR_Buzzer_TimerHandle, PDC_BUZZER_PERIOD_TWO);
 				break;
 			case 3:
 				PdcR_DistanceRange = 0;
-				Rte_Call_OsTimer_R_OsTimerPort_OsTimerStart(Os_PdcR_Buzzer_TimerHandle, PDC_BUZZER_PERIOD_THREE);
+				osTimerStart(Os_PdcR_Buzzer_TimerHandle, PDC_BUZZER_PERIOD_THREE);
 				break;
 			case 4:
 				PdcR_DistanceRange = 0;
-				Rte_Call_OsTimer_R_OsTimerPort_OsTimerStart(Os_PdcR_Buzzer_TimerHandle, PDC_BUZZER_PERIOD_FOUR);
+				osTimerStart(Os_PdcR_Buzzer_TimerHandle, PDC_BUZZER_PERIOD_FOUR);
 				break;
 			default:
 				break;
@@ -233,25 +233,25 @@ VOID Pdc_Rear_TriggerBuzzer()
 ************************************************************************************/
 VOID Pdc_Front_TriggerBuzzer()
 {
-	if(Rte_Call_Os_R_OsPort_OsTimerIsRunning(Os_PdcF_Buzzer_TimerHandle) == 0)
+	if(osTimerIsRunning(Os_PdcF_Buzzer_TimerHandle) == 0)
 	{
 		switch(PdcF_DistanceRange)
 		{
 			case 1:
 				PdcF_DistanceRange = 0;
-				Rte_Call_OsTimer_R_OsTimerPort_OsTimerStart(Os_PdcF_Buzzer_TimerHandle, PDC_BUZZER_PERIOD_ONE);
+				osTimerStart(Os_PdcF_Buzzer_TimerHandle, PDC_BUZZER_PERIOD_ONE);
 				break;
 			case 2:
 				PdcF_DistanceRange = 0;
-				Rte_Call_OsTimer_R_OsTimerPort_OsTimerStart(Os_PdcF_Buzzer_TimerHandle, PDC_BUZZER_PERIOD_TWO);
+				osTimerStart(Os_PdcF_Buzzer_TimerHandle, PDC_BUZZER_PERIOD_TWO);
 				break;
 			case 3:
 				PdcF_DistanceRange = 0;
-				Rte_Call_OsTimer_R_OsTimerPort_OsTimerStart(Os_PdcF_Buzzer_TimerHandle, PDC_BUZZER_PERIOD_THREE);
+				osTimerStart(Os_PdcF_Buzzer_TimerHandle, PDC_BUZZER_PERIOD_THREE);
 				break;
 			case 4:
 				PdcF_DistanceRange = 0;
-				Rte_Call_OsTimer_R_OsTimerPort_OsTimerStart(Os_PdcF_Buzzer_TimerHandle, PDC_BUZZER_PERIOD_FOUR);
+				osTimerStart(Os_PdcF_Buzzer_TimerHandle, PDC_BUZZER_PERIOD_FOUR);
 				break;
 			default:
 				break;

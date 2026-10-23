@@ -20,7 +20,10 @@
 #include "Std_Types.h"
 #include "PortH.h"
 #include "SystemManager.h"
-#include "Rte.h"
+#include "App_Dependencies.h"
+#include "g26_app_net.h"
+#include "g26_board.h"
+#include "g26_bsw.h"
 #include "WatchdogManager.h"
 /*****************************************
 *		END OF INCLUDE PATHS		     *
@@ -256,13 +259,13 @@ void vApplicationMallocFailedHook(void)
 void PreSleepProcessing(uint32_t ulExpectedIdleTime)
 {
 	__disable_irq();
-	Rte_Runnable_Wdg_MainFunction();
+	Watchdog_MainFunction();
 	HAL_PWR_EnterSLEEPMode(PWR_MAINREGULATOR_ON, PWR_SLEEPENTRY_WFI);
 }
 
 void PostSleepProcessing(uint32_t ulExpectedIdleTime)
 {
-	Rte_Runnable_Wdg_MainFunction();
+	Watchdog_MainFunction();
 	__enable_irq();
 }
 /* USER CODE END PREPOSTSLEEP */
@@ -375,10 +378,13 @@ void OS_TASK_ASIL_APPL_Main(void *argument)
 	for(;;)
 	{
 		osSemaphoreAcquire(Sph_ASIL_APPLHandle, osWaitForever);
-		Rte_Runnable_Btc_MainFunction();
-		Rte_Runnable_CenLoc_MainFunction();
-		Rte_Runnable_ExtLights_MainFunction();
-		Rte_Runnable_IntLights_MainFunction();
+		Btc_MainFunction();
+#if G26_MCP2515_REWIRED_BOARD
+		G26_AppNetApplyCommand();
+#endif
+		CenLoc_MainFunction();
+		ExtLights_MainFunction();
+		IntLights_MainFunction();
 		osSemaphoreRelease(Sph_QM_APPLHandle);
 		vTaskDelayUntil(&ASIL_APPL_Main, pdMS_TO_TICKS(5));
 	}
@@ -393,9 +399,9 @@ void OS_TASK_QM_APPL_Main(void *argument)
 	for(;;)
 	{
 		osSemaphoreAcquire(Sph_QM_APPLHandle, osWaitForever);
-		Rte_Runnable_SecAlm_MainFunction();
-		Rte_Runnable_Pdc_MainFunction();
-		Rte_Runnable_DiagCtrl_MainFunction();
+		SecAlm_MainFunction();
+		Pdc_MainFunction();
+		DiagCtrl_MainFunction();
 		osSemaphoreRelease(Sph_ASIL_BSWHandle);
 		vTaskDelayUntil(&QM_APPL_Main, pdMS_TO_TICKS(5));
 	}
@@ -410,10 +416,11 @@ void OS_TASK_ASIL_BSW_Main(void *argument)
 	for(;;)
 	{
 		osSemaphoreAcquire(Sph_ASIL_BSWHandle, osWaitForever);
-		Rte_Runnable_Wdg_MainFunction();
-		Rte_Runnable_Uart_MainFunction();
-		Rte_Runnable_Crc_MainFunction();
-		Rte_Runnable_Tim_MainFunction();
+		Watchdog_MainFunction();
+
+		Uart_MainFunction();
+		Crc_MainFunction();
+		Tim_MainFunction();
 		osSemaphoreRelease(Sph_QM_BSWHandle);
 		vTaskDelayUntil(&ASIL_BSW_Main, pdMS_TO_TICKS(5));
 	}
@@ -428,10 +435,10 @@ void OS_TASK_QM_BSW_Main(void *argument)
 	for(;;)
 	{
 		osSemaphoreAcquire(Sph_QM_BSWHandle, osWaitForever);
-		Rte_Runnable_EcuM_MainFunction();
-		Rte_Runnable_SystemManager_MainFunction();
-		Rte_Runnable_Adc_MainFunction();
-		Rte_Runnable_Dem_MainFunction();
+		EcuM_MainFunction();
+		SystemManager_MainFunction();
+		Adc_MainFunction();
+		G26_BswMainFunction();
 		osSemaphoreRelease(Sph_ASIL_APPLHandle);
 		vTaskDelayUntil(&QM_BSW_Main, pdMS_TO_TICKS(5));
 	}
@@ -444,7 +451,7 @@ void Os_SecAlm_AlarmReset_Callback(void *argument)
   /* USER CODE BEGIN Os_SecAlm_AlarmReset_Callback */
 	/* Reset the security alarm counter trigger. */
 	uint16 local = 0;
-	Rte_Write_SecAlm_SecAlmPort_SecAlm_SensorStatusCounter(&local);
+	SecAlm_SensorStatusCounter = local;
   /* USER CODE END Os_SecAlm_AlarmReset_Callback */
 }
 
@@ -456,17 +463,17 @@ void Os_CenLoc_LockUnlockSequence_Timer_Callback(void *argument)
 	 * Then if there is either a lock or an unlock sequence increase the counter to process the states
 	 * in the application. */
 	if(Os_LockUnlockSequence_Counter <= 6
-		&& ((Rte_P_CenLoc_CenLocPort_CenLoc_CurrentState == STD_LOW && Rte_P_CenLoc_CenLocPort_CenLoc_PreviousStateFlag == STD_HIGH)
-		|| (Rte_P_CenLoc_CenLocPort_CenLoc_CurrentState == STD_HIGH && Rte_P_CenLoc_CenLocPort_CenLoc_PreviousStateFlag == STD_LOW)))
+		&& ((CenLoc_CurrentState == STD_LOW && CenLoc_PreviousStateFlag == STD_HIGH)
+		|| (CenLoc_CurrentState == STD_HIGH && CenLoc_PreviousStateFlag == STD_LOW)))
 	{
 		Os_LockUnlockSequence_Counter = Os_LockUnlockSequence_Counter + 1;
-		Rte_Write_CenLoc_CenLocPort_CenLoc_BlinkCounter(&Os_LockUnlockSequence_Counter);
+		CenLoc_BlinkCounter = Os_LockUnlockSequence_Counter;
 	}
 	else
 	{
 		/* Update the counter with out of bounds value to prevent unexpected triggering. */
 		Os_LockUnlockSequence_Counter = 7;
-		Rte_Write_CenLoc_CenLocPort_CenLoc_BlinkCounter(&Os_LockUnlockSequence_Counter);
+		CenLoc_BlinkCounter = Os_LockUnlockSequence_Counter;
 	}
 
   /* USER CODE END Os_CenLoc_LockUnlockSequence_Timer_Callback */
@@ -479,7 +486,7 @@ void Os_SecAlmLed_TurnOnCyclic_Timer_Callback(void *argument)
 	/* Increase the counter variable used in the timer for the alarm LED
 	 * that expires every 3,75 seconds. */
 	Os_TurnOnCyclic_Counter = Os_TurnOnCyclic_Counter + 1;
-	Rte_Write_CenLoc_CenLocPort_CenLoc_CyclicAlarmCounter(&Os_TurnOnCyclic_Counter);
+	CenLoc_CyclicAlarmCounter = Os_TurnOnCyclic_Counter;
   /* USER CODE END Os_SecAlmLed_TurnOnCyclic_Timer_Callback */
 }
 
@@ -489,7 +496,7 @@ void Os_SecAlmLedTurnOn_Timer_Callback(void *argument)
   /* USER CODE BEGIN Os_SecAlmLedTurnOn_Timer_Callback */
 	/* Increase the counter variable used in the turning on the alarm LED for 0,25 seconds. */
 	Os_TurnOnLed_Counter = Os_TurnOnLed_Counter + 1;
-	Rte_Write_CenLoc_CenLocPort_CenLoc_TurnOnLedCounter(&Os_TurnOnLed_Counter);
+	CenLoc_TurnOnLedCounter = Os_TurnOnLed_Counter;
   /* USER CODE END Os_SecAlmLedTurnOn_Timer_Callback */
 }
 
@@ -500,7 +507,7 @@ void Os_FollowMeHome_Timer_Callback(void *argument)
 	/* Increase the counter variable used in the follow me home concept when the timer
 	 * period expires for the lights to go off. */
 	Os_FollowMeHome_Counter = Os_FollowMeHome_Counter + 1;
-	Rte_Write_CenLoc_CenLocPort_CenLoc_FollowMeHomeCounter(&Os_FollowMeHome_Counter);
+	CenLoc_FollowMeHomeCounter = Os_FollowMeHome_Counter;
   /* USER CODE END Os_FollowMeHome_Timer_Callback */
 }
 
@@ -509,30 +516,30 @@ void Os_TurnSignals_Timer_Callback(void *argument)
 {
   /* USER CODE BEGIN Os_TurnSignals_Timer_Callback */
 	/* Increase the respective counter on request from the specific light in turn signals. */
-	if(Rte_P_ExtLights_ExtLightsPort_ExtLights_TurnSignalLeft_CurrentState == STD_HIGH)
+	if(ExtLights_TurnSignalLeft_CurrentState == STD_HIGH)
 	{
 		Os_Lts_Counter = Os_Lts_Counter + 1;
-		Rte_Write_ExtLights_ExtLightsPort_ExtLights_LTSFlag(&Os_Lts_Counter);
+		ExtLights_LTSFlag = Os_Lts_Counter;
 	}
 	else
 	{
 		/* do nothing */
 	}
 
-	if(Rte_P_ExtLights_ExtLightsPort_ExtLights_TurnSignalRight_CurrentState == STD_HIGH)
+	if(ExtLights_TurnSignalRight_CurrentState == STD_HIGH)
 	{
 		Os_Rts_Counter = Os_Rts_Counter + 1;
-		Rte_Write_ExtLights_ExtLightsPort_ExtLights_RTSFlag(&Os_Rts_Counter);
+		ExtLights_RTSFlag = Os_Rts_Counter;
 	}
 	else
 	{
 		/* do nothing */
 	}
 
-	if(Rte_P_ExtLights_ExtLightsPort_ExtLights_HazardLight_CurrentState == STD_HIGH)
+	if(ExtLights_HazardLight_CurrentState == STD_HIGH)
 	{
 		Os_HL_Counter = Os_HL_Counter + 1;
-		Rte_Write_ExtLights_ExtLightsPort_ExtLights_HLFlag(&Os_HL_Counter);
+		ExtLights_HLFlag = Os_HL_Counter;
 	}
 	else
 	{
@@ -546,7 +553,7 @@ void Os_SecAlmAlarm_Timer_Callback(void *argument)
 {
   /* USER CODE BEGIN Os_SecAlmAlarm_Timer_Callback */
 	/* Increase the security alarm trigger counter when the alarm is on. */
-	if(Rte_P_SecAlm_SecAlmPort_SecAlm_TriggerIRQCounterForTimer4 == STD_LOW)
+	if(SecAlm_TriggerIRQCounterForTimer4 == STD_LOW)
 	{
 		Os_Alarm_Counter = STD_LOW;
 	}
@@ -555,7 +562,7 @@ void Os_SecAlmAlarm_Timer_Callback(void *argument)
 		/* do nothing */
 	}
 	Os_Alarm_Counter = Os_Alarm_Counter + 1;
-	Rte_Write_SecAlm_SecAlmPort_SecAlm_TriggerIRQCounterForTimer4(&Os_Alarm_Counter);
+	SecAlm_TriggerIRQCounterForTimer4 = Os_Alarm_Counter;
   /* USER CODE END Os_SecAlmAlarm_Timer_Callback */
 }
 

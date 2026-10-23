@@ -8,7 +8,7 @@
 ******************************************/
 #include "ExtLights.h"
 #include "PortH.h"
-#include "Rte.h"
+#include "App_Dependencies.h"
 /*****************************************
 		END OF INCLUDE PATHS		     *
 ******************************************/
@@ -103,10 +103,10 @@ VOID ExtLights_TurnSignalHazardLight()
 	if(ExtLights_TurnSignalLeft_CurrentState == STD_HIGH)
 	{
 		/* Check if the timer related to the turn signals is off. */
-		if(Rte_Call_Os_R_OsPort_OsTimerIsRunning(Os_TurnSignals_TimerHandle) == 0)
+		if(osTimerIsRunning(Os_TurnSignals_TimerHandle) == 0)
 		{
 			/* Start the timer with the designated period counter value. */
-			Rte_Call_OsTimer_R_OsTimerPort_OsTimerStart(Os_TurnSignals_TimerHandle, 500);
+			osTimerStart(Os_TurnSignals_TimerHandle, 500);
 		}
 		else
 		{
@@ -115,11 +115,11 @@ VOID ExtLights_TurnSignalHazardLight()
 		/* Turn on and off the turn signal. */
 		if(ExtLights_LTSFlag % 2 == 1)
 		{
-			Rte_Call_Tim_R_TimPort_HAL_TIM_PWM_Start_IT(Rte_P_Tim_TimPort_Htim4, Rte_P_Tim_TimPort_TimChannel3);
+			HAL_TIM_PWM_Start_IT(&htim4, TIM_CHANNEL_3);
 		}
 		else if(ExtLights_LTSFlag % 2 == 0)
 		{
-			Rte_Call_Tim_R_TimPort_HAL_TIM_PWM_Stop_IT(Rte_P_Tim_TimPort_Htim4, Rte_P_Tim_TimPort_TimChannel3);
+			HAL_TIM_PWM_Stop_IT(&htim4, TIM_CHANNEL_3);
 		}
 		else
 		{
@@ -134,10 +134,10 @@ VOID ExtLights_TurnSignalHazardLight()
 	if(ExtLights_TurnSignalRight_CurrentState == STD_HIGH)
 	{
 		/* Check if the timer related to the turn signals is off. */
-		if(Rte_Call_Os_R_OsPort_OsTimerIsRunning(Os_TurnSignals_TimerHandle) == 0)
+		if(osTimerIsRunning(Os_TurnSignals_TimerHandle) == 0)
 		{
 			/* Start the timer with the designated period counter value. */
-			Rte_Call_OsTimer_R_OsTimerPort_OsTimerStart(Os_TurnSignals_TimerHandle, 500);
+			osTimerStart(Os_TurnSignals_TimerHandle, 500);
 		}
 		else
 		{
@@ -146,11 +146,11 @@ VOID ExtLights_TurnSignalHazardLight()
 		/* Turn on and off the turn signal. */
 		if(ExtLights_RTSFlag % 2 == 1)
 		{
-			Rte_Call_Tim_R_TimPort_HAL_TIM_PWM_Start_IT(Rte_P_Tim_TimPort_Htim4, Rte_P_Tim_TimPort_TimChannel4);
+			HAL_TIM_PWM_Start_IT(&htim4, TIM_CHANNEL_4);
 		}
 		else if(ExtLights_RTSFlag % 2 == 0)
 		{
-			Rte_Call_Tim_R_TimPort_HAL_TIM_PWM_Stop_IT(Rte_P_Tim_TimPort_Htim4, Rte_P_Tim_TimPort_TimChannel4);
+			HAL_TIM_PWM_Stop_IT(&htim4, TIM_CHANNEL_4);
 		}
 		else
 		{
@@ -165,10 +165,10 @@ VOID ExtLights_TurnSignalHazardLight()
 	if(ExtLights_HazardLight_CurrentState == STD_HIGH)
 	{
 		/* Check if the timer related to the turn signals is off. */
-		if(Rte_Call_Os_R_OsPort_OsTimerIsRunning(Os_TurnSignals_TimerHandle) == 0)
+		if(osTimerIsRunning(Os_TurnSignals_TimerHandle) == 0)
 		{
 			/* Start the timer with the designated period counter value. */
-			Rte_Call_OsTimer_R_OsTimerPort_OsTimerStart(Os_TurnSignals_TimerHandle, 500);
+			osTimerStart(Os_TurnSignals_TimerHandle, 500);
 		}
 		else
 		{
@@ -177,13 +177,13 @@ VOID ExtLights_TurnSignalHazardLight()
 		/* Turn on and off the turn signal. */
 		if(ExtLights_HLFlag % 2 == 1)
 		{
-			Rte_Call_Tim_R_TimPort_HAL_TIM_PWM_Start_IT(Rte_P_Tim_TimPort_Htim4, Rte_P_Tim_TimPort_TimChannel3);
-			Rte_Call_Tim_R_TimPort_HAL_TIM_PWM_Start_IT(Rte_P_Tim_TimPort_Htim4, Rte_P_Tim_TimPort_TimChannel4);
+			HAL_TIM_PWM_Start_IT(&htim4, TIM_CHANNEL_3);
+			HAL_TIM_PWM_Start_IT(&htim4, TIM_CHANNEL_4);
 		}
 		else if(ExtLights_HLFlag % 2 == 0)
 		{
-			Rte_Call_Tim_R_TimPort_HAL_TIM_PWM_Stop_IT(Rte_P_Tim_TimPort_Htim4, Rte_P_Tim_TimPort_TimChannel3);
-			Rte_Call_Tim_R_TimPort_HAL_TIM_PWM_Stop_IT(Rte_P_Tim_TimPort_Htim4, Rte_P_Tim_TimPort_TimChannel4);
+			HAL_TIM_PWM_Stop_IT(&htim4, TIM_CHANNEL_3);
+			HAL_TIM_PWM_Stop_IT(&htim4, TIM_CHANNEL_4);
 		}
 		else
 		{
@@ -197,7 +197,7 @@ VOID ExtLights_TurnSignalHazardLight()
 	/* Only one pair of turn signals can be on at a time. Set on one pair and the other off. */
 	if(ExtLights_TurnSignalRight_CurrentState == STD_LOW && ExtLights_HazardLight_CurrentState == STD_LOW)
 	{
-		Rte_Call_Tim_R_TimPort_HAL_TIM_PWM_Stop_IT(Rte_P_Tim_TimPort_Htim4, Rte_P_Tim_TimPort_TimChannel4);
+		HAL_TIM_PWM_Stop_IT(&htim4, TIM_CHANNEL_4);
 	}
 	else
 	{
@@ -206,7 +206,7 @@ VOID ExtLights_TurnSignalHazardLight()
 	/* Only one pair of turn signals can be on at a time. Set on one pair and the other off. */
 	if(ExtLights_TurnSignalLeft_CurrentState == STD_LOW && ExtLights_HazardLight_CurrentState == STD_LOW)
 	{
-		Rte_Call_Tim_R_TimPort_HAL_TIM_PWM_Stop_IT(Rte_P_Tim_TimPort_Htim4, Rte_P_Tim_TimPort_TimChannel3);
+		HAL_TIM_PWM_Stop_IT(&htim4, TIM_CHANNEL_3);
 	}
 	else
 	{
@@ -228,7 +228,7 @@ VOID ExtLights_PrevStateTSHL()
 	{
 		ExtLights_LTS_PrevState = ExtLights_TurnSignalLeft_CurrentState;
 		ExtLights_LTSFlag = 0;
-		Rte_Write_Os_R_OsPort_Os_Lts_Counter(&ExtLights_LTSFlag);
+		Os_Lts_Counter = ExtLights_LTSFlag;
 	}
 	else
 	{
@@ -239,7 +239,7 @@ VOID ExtLights_PrevStateTSHL()
 	{
 		ExtLights_RTS_PrevState = ExtLights_TurnSignalRight_CurrentState;
 		ExtLights_RTSFlag = 0;
-		Rte_Write_Os_R_OsPort_Os_Rts_Counter(&ExtLights_RTSFlag);
+		Os_Rts_Counter = ExtLights_RTSFlag;
 	}
 	else
 	{
@@ -250,7 +250,7 @@ VOID ExtLights_PrevStateTSHL()
 	{
 		ExtLights_HL_PrevState = ExtLights_HazardLight_CurrentState;
 		ExtLights_HLFlag = 0;
-		Rte_Write_Os_R_OsPort_Os_HL_Counter(&ExtLights_HLFlag);
+		Os_HL_Counter = ExtLights_HLFlag;
 	}
 	else
 	{
@@ -269,21 +269,21 @@ VOID ExtLights_LightState()
 	/* Process turn signals state. */
 	ExtLights_PrevStateTSHL();
 	/* Follow me home is on, then turn on the respective lights. */
-	if(Rte_P_CenLoc_CenLocPort_CenLoc_FollowMeHomeState == STD_HIGH)
+	if(CenLoc_FollowMeHomeState == STD_HIGH)
 	{
 		ExtLights_LightSwitchMode();
-		Rte_Call_Tim_R_TimPort_HAL_TIM_PWM_Start_IT(Rte_P_Tim_TimPort_Htim2, Rte_P_Tim_TimPort_TimChannel1);
-		Rte_Call_Tim_R_TimPort_HAL_TIM_PWM_Start_IT(Rte_P_Tim_TimPort_Htim2, Rte_P_Tim_TimPort_TimChannel2);
+		HAL_TIM_PWM_Start_IT(&htim2, TIM_CHANNEL_1);
+		HAL_TIM_PWM_Start_IT(&htim2, TIM_CHANNEL_2);
 		ExtLights_LowBeam_CurrentState = STD_HIGH;
 		ExtLights_RearPositionLights_CurrentState = STD_HIGH;
 	}/* Follow me home is off, turn off the lights.*/
-	else if(Rte_P_CenLoc_CenLocPort_CenLoc_FollowMeHomeState == STD_LOW)
+	else if(CenLoc_FollowMeHomeState == STD_LOW)
 	{
 		ExtLights_LightSwitchMode();
 		if(ExtLights_LightsSwitch_CurrentState == STD_LOW)
 		{
-			Rte_Call_Tim_R_TimPort_HAL_TIM_PWM_Stop_IT(Rte_P_Tim_TimPort_Htim2, Rte_P_Tim_TimPort_TimChannel1);
-			Rte_Call_Tim_R_TimPort_HAL_TIM_PWM_Stop_IT(Rte_P_Tim_TimPort_Htim2, Rte_P_Tim_TimPort_TimChannel2);
+			HAL_TIM_PWM_Stop_IT(&htim2, TIM_CHANNEL_1);
+			HAL_TIM_PWM_Stop_IT(&htim2, TIM_CHANNEL_2);
 			ExtLights_LowBeam_CurrentState = STD_LOW;
 			ExtLights_RearPositionLights_CurrentState = STD_LOW;
 		}
@@ -307,11 +307,11 @@ VOID ExtLights_LightState()
 	{
 		if(ExtLights_LightsSwitch_CurrentState == STD_LOW)
 		{
-			Rte_Write_CenLoc_CenLocPort_CenLoc_FollowMeHomeState(STD_LOW);
-			Rte_Write_CenLoc_CenLocPort_CenLoc_FollowMeHomeCounter((uint8*)2);
-			Rte_Write_Os_R_OsPort_Os_FollowMeHome_Counter((uint8*)2);
-			Rte_Call_Tim_R_TimPort_HAL_TIM_PWM_Stop_IT(Rte_P_Tim_TimPort_Htim2, Rte_P_Tim_TimPort_TimChannel1);
-			Rte_Call_Tim_R_TimPort_HAL_TIM_PWM_Stop_IT(Rte_P_Tim_TimPort_Htim2, Rte_P_Tim_TimPort_TimChannel2);
+			CenLoc_FollowMeHomeState = STD_LOW;
+			CenLoc_FollowMeHomeCounter = 2;
+			Os_FollowMeHome_Counter = 2;
+			HAL_TIM_PWM_Stop_IT(&htim2, TIM_CHANNEL_1);
+			HAL_TIM_PWM_Stop_IT(&htim2, TIM_CHANNEL_2);
 			ExtLights_LowBeam_CurrentState = STD_LOW;
 			ExtLights_RearPositionLights_CurrentState = STD_LOW;
 		}
@@ -325,17 +325,17 @@ VOID ExtLights_LightState()
 		/* do nothing */
 	}
 	/* Control the turn signals for the central lock lock unlock sequence when requested. */
-	if(Rte_P_CenLoc_CenLocPort_CenLoc_BlinkState == STD_HIGH)
+	if(CenLoc_BlinkState == STD_HIGH)
 	{
-		Rte_Call_Tim_R_TimPort_HAL_TIM_PWM_Start_IT(Rte_P_Tim_TimPort_Htim4, Rte_P_Tim_TimPort_TimChannel3);
-		Rte_Call_Tim_R_TimPort_HAL_TIM_PWM_Start_IT(Rte_P_Tim_TimPort_Htim4, Rte_P_Tim_TimPort_TimChannel4);
+		HAL_TIM_PWM_Start_IT(&htim4, TIM_CHANNEL_3);
+		HAL_TIM_PWM_Start_IT(&htim4, TIM_CHANNEL_4);
 	}
-	else if(Rte_P_CenLoc_CenLocPort_CenLoc_BlinkState == STD_LOW)
+	else if(CenLoc_BlinkState == STD_LOW)
 	{
-		Rte_Call_Tim_R_TimPort_HAL_TIM_PWM_Stop_IT(Rte_P_Tim_TimPort_Htim4, Rte_P_Tim_TimPort_TimChannel3);
-		Rte_Call_Tim_R_TimPort_HAL_TIM_PWM_Stop_IT(Rte_P_Tim_TimPort_Htim4, Rte_P_Tim_TimPort_TimChannel4);
+		HAL_TIM_PWM_Stop_IT(&htim4, TIM_CHANNEL_3);
+		HAL_TIM_PWM_Stop_IT(&htim4, TIM_CHANNEL_4);
 	}/* Allows for turning on the hazard lights or turn signals independently of other states in the system. */
-	else if(Rte_P_CenLoc_CenLocPort_CenLoc_BlinkState == 2 || Rte_P_CenLoc_CenLocPort_CenLoc_BlinkState == 4)
+	else if(CenLoc_BlinkState == 2 || CenLoc_BlinkState == 4)
 	{
 		ExtLights_TurnSignalHazardLight();
 	}
@@ -375,26 +375,26 @@ VOID ExtLights_LightState()
 		if(ExtLights_BrakeLight_CurrentState != ExtLights_Previous_BrakeLight_CurrentState)
 		{
 			ExtLights_Previous_BrakeLight_CurrentState = ExtLights_BrakeLight_CurrentState;
-			Rte_Write_TimH_TimHPort_Tim3Ccr2(0);
+			TIM3->CCR2 = (0);
 		}
 		else
 		{
 			/* do nothing */
 		}
-		Rte_Call_Tim_R_TimPort_HAL_TIM_PWM_Start_IT(Rte_P_Tim_TimPort_Htim3, Rte_P_Tim_TimPort_TimChannel2);
+		HAL_TIM_PWM_Start_IT(&htim3, TIM_CHANNEL_2);
 	}
 	else if(ExtLights_BrakeLight_CurrentState == STD_LOW)
 	{
 		if(ExtLights_BrakeLight_CurrentState != ExtLights_Previous_BrakeLight_CurrentState)
 		{
 			ExtLights_Previous_BrakeLight_CurrentState = ExtLights_BrakeLight_CurrentState;
-			Rte_Write_TimH_TimHPort_Tim3Ccr2(0);
+			TIM3->CCR2 = (0);
 		}
 		else
 		{
 			/* do nothing */
 		}
-		Rte_Call_Tim_R_TimPort_HAL_TIM_PWM_Stop_IT(Rte_P_Tim_TimPort_Htim3, Rte_P_Tim_TimPort_TimChannel2);
+		HAL_TIM_PWM_Stop_IT(&htim3, TIM_CHANNEL_2);
 	}
 	else
 	{
@@ -406,26 +406,26 @@ VOID ExtLights_LightState()
 		if(ExtLights_RearFogLight_CurrentState != ExtLights_Previous_RearFogLight_CurrentState)
 		{
 			ExtLights_Previous_RearFogLight_CurrentState = ExtLights_RearFogLight_CurrentState;
-			Rte_Write_TimH_TimHPort_Tim3Ccr4(0);
+			TIM3->CCR4 = (0);
 		}
 		else
 		{
 			/* do nothing */
 		}
-		Rte_Call_Tim_R_TimPort_HAL_TIM_PWM_Start_IT(Rte_P_Tim_TimPort_Htim3, Rte_P_Tim_TimPort_TimChannel4);
+		HAL_TIM_PWM_Start_IT(&htim3, TIM_CHANNEL_4);
 	}
 	else if(ExtLights_RearFogLight_CurrentState == STD_LOW)
 	{
 		if(ExtLights_RearFogLight_CurrentState != ExtLights_Previous_RearFogLight_CurrentState)
 		{
 			ExtLights_Previous_RearFogLight_CurrentState = ExtLights_RearFogLight_CurrentState;
-			Rte_Write_TimH_TimHPort_Tim3Ccr4(0);
+			TIM3->CCR4 = (0);
 		}
 		else
 		{
 			/* do nothing */
 		}
-		Rte_Call_Tim_R_TimPort_HAL_TIM_PWM_Stop_IT(Rte_P_Tim_TimPort_Htim3, Rte_P_Tim_TimPort_TimChannel4);
+		HAL_TIM_PWM_Stop_IT(&htim3, TIM_CHANNEL_4);
 	}
 	else
 	{
@@ -437,26 +437,26 @@ VOID ExtLights_LightState()
 		if(ExtLights_FrontFogLight_CurrentState != ExtLights_Previous_FrontFogLight_CurrentState)
 		{
 			ExtLights_Previous_FrontFogLight_CurrentState = ExtLights_FrontFogLight_CurrentState;
-			Rte_Write_TimH_TimHPort_Tim3Ccr3(0);
+			TIM3->CCR3 = (0);
 		}
 		else
 		{
 			/* do nothing */
 		}
-		Rte_Call_Tim_R_TimPort_HAL_TIM_PWM_Start_IT(Rte_P_Tim_TimPort_Htim3, Rte_P_Tim_TimPort_TimChannel3);
+		HAL_TIM_PWM_Start_IT(&htim3, TIM_CHANNEL_3);
 	}
 	else if(ExtLights_FrontFogLight_CurrentState == STD_LOW)
 	{
 		if(ExtLights_FrontFogLight_CurrentState != ExtLights_Previous_FrontFogLight_CurrentState)
 		{
 			ExtLights_Previous_FrontFogLight_CurrentState = ExtLights_FrontFogLight_CurrentState;
-			Rte_Write_TimH_TimHPort_Tim3Ccr3(0);
+			TIM3->CCR3 = (0);
 		}
 		else
 		{
 			/* do nothing */
 		}
-		Rte_Call_Tim_R_TimPort_HAL_TIM_PWM_Stop_IT(Rte_P_Tim_TimPort_Htim3, Rte_P_Tim_TimPort_TimChannel3);
+		HAL_TIM_PWM_Stop_IT(&htim3, TIM_CHANNEL_3);
 	}
 	else
 	{
@@ -465,7 +465,7 @@ VOID ExtLights_LightState()
 	/* Turn on the reverse light. */
 	ExtLights_ReverseLight(ExtLights_ReverseLight_CurrentState);
 
-	if(Rte_P_CenLoc_CenLocPort_CenLoc_CurrentState == STD_LOW)
+	if(CenLoc_CurrentState == STD_LOW)
 	{
 		ExtLights_ReverseLight_CurrentState = STD_LOW;
 		ExtLights_RearFogLight_CurrentState = STD_LOW;
@@ -507,8 +507,8 @@ VOID ExtLights_LightSwitchMode()
 			if(ExtLights_Previous_LightSwitchState != ExtLights_LightsSwitch_CurrentState)
 			{
 				ExtLights_Previous_LightSwitchState = ExtLights_LightsSwitch_CurrentState;
-				Rte_Write_TimH_TimHPort_Tim2Ccr1(0);
-				Rte_Write_TimH_TimHPort_Tim2Ccr2(0);
+				TIM2->CCR1 = (0);
+				TIM2->CCR2 = (0);
 				ExtLights_LowBeam_CurrentState = STD_LOW;
 				ExtLights_RearPositionLights_CurrentState = STD_LOW;
 			}
@@ -516,17 +516,17 @@ VOID ExtLights_LightSwitchMode()
 			{
 				/* do nothing */
 			}
-			Rte_Call_Tim_R_TimPort_HAL_TIM_PWM_Stop_IT(Rte_P_Tim_TimPort_Htim2, Rte_P_Tim_TimPort_TimChannel1);
-			Rte_Call_Tim_R_TimPort_HAL_TIM_PWM_Stop_IT(Rte_P_Tim_TimPort_Htim2, Rte_P_Tim_TimPort_TimChannel2);
+			HAL_TIM_PWM_Stop_IT(&htim2, TIM_CHANNEL_1);
+			HAL_TIM_PWM_Stop_IT(&htim2, TIM_CHANNEL_2);
 			ExtLights_LowBeam_CurrentState = STD_LOW;
 			ExtLights_RearPositionLights_CurrentState = STD_LOW;
 			break;
 		/* Switch is on position one, turn automatic lights controlled by sensor's input. */
 		case EXTLIGHTS_LIGHTSWITCH_STATEONE:
 			/* Read the sensor status. */
-			if(Rte_P_Os_OsPort_Os_Counter % 39 == 0)
+			if(Os_Counter % 39 == 0)
 			{
-				Rte_Call_SenCtrl_P_SenCtrlPort_SenCtrl_ProcessSensorValue(EXTLIGHTS_LS_REQUEST);
+				SenCtrl_ProcessSensorValue(EXTLIGHTS_LS_REQUEST);
 			}
 			else
 			{
@@ -535,8 +535,8 @@ VOID ExtLights_LightSwitchMode()
 			if(ExtLights_Previous_LightSwitchState != ExtLights_LightsSwitch_CurrentState)
 			{
 				ExtLights_Previous_LightSwitchState = ExtLights_LightsSwitch_CurrentState;
-				Rte_Write_TimH_TimHPort_Tim2Ccr1(0);
-				Rte_Write_TimH_TimHPort_Tim2Ccr2(0);
+				TIM2->CCR1 = (0);
+				TIM2->CCR2 = (0);
 				ExtLights_LowBeam_CurrentState = STD_LOW;
 				ExtLights_RearPositionLights_CurrentState = STD_LOW;
 			}
@@ -549,15 +549,15 @@ VOID ExtLights_LightSwitchMode()
 			{
 				ExtLights_LowBeam_CurrentState = STD_HIGH;
 				ExtLights_RearPositionLights_CurrentState = STD_HIGH;
-				Rte_Call_Tim_R_TimPort_HAL_TIM_PWM_Start_IT(Rte_P_Tim_TimPort_Htim2, Rte_P_Tim_TimPort_TimChannel1);
-				Rte_Call_Tim_R_TimPort_HAL_TIM_PWM_Start_IT(Rte_P_Tim_TimPort_Htim2, Rte_P_Tim_TimPort_TimChannel2);
+				HAL_TIM_PWM_Start_IT(&htim2, TIM_CHANNEL_1);
+				HAL_TIM_PWM_Start_IT(&htim2, TIM_CHANNEL_2);
 			}/* Else turn them off. */
 			else if(ExtLights_LightSensorState != 1)
 			{
 				ExtLights_LowBeam_CurrentState = STD_LOW;
 				ExtLights_RearPositionLights_CurrentState = STD_LOW;
-				Rte_Call_Tim_R_TimPort_HAL_TIM_PWM_Stop_IT(Rte_P_Tim_TimPort_Htim2, Rte_P_Tim_TimPort_TimChannel1);
-				Rte_Call_Tim_R_TimPort_HAL_TIM_PWM_Stop_IT(Rte_P_Tim_TimPort_Htim2, Rte_P_Tim_TimPort_TimChannel2);
+				HAL_TIM_PWM_Stop_IT(&htim2, TIM_CHANNEL_1);
+				HAL_TIM_PWM_Stop_IT(&htim2, TIM_CHANNEL_2);
 			}
 			break;
 		/* Switch is on position three, turn on position lights. */
@@ -565,8 +565,8 @@ VOID ExtLights_LightSwitchMode()
 			if(ExtLights_Previous_LightSwitchState != ExtLights_LightsSwitch_CurrentState)
 			{
 				ExtLights_Previous_LightSwitchState = ExtLights_LightsSwitch_CurrentState;
-				Rte_Write_TimH_TimHPort_Tim2Ccr1(0);
-				Rte_Write_TimH_TimHPort_Tim2Ccr2(0);
+				TIM2->CCR1 = (0);
+				TIM2->CCR2 = (0);
 				ExtLights_LowBeam_CurrentState = STD_LOW;
 				ExtLights_RearPositionLights_CurrentState = STD_LOW;
 			}
@@ -574,10 +574,10 @@ VOID ExtLights_LightSwitchMode()
 			{
 				/* do nothing */
 			}
-			Rte_Call_Tim_R_TimPort_HAL_TIM_PWM_Start_IT(Rte_P_Tim_TimPort_Htim2, Rte_P_Tim_TimPort_TimChannel1);
-			Rte_Call_Tim_R_TimPort_HAL_TIM_PWM_Start_IT(Rte_P_Tim_TimPort_Htim2, Rte_P_Tim_TimPort_TimChannel2);
-			Rte_Write_TimH_TimHPort_Tim2Ccr1(750);
-			Rte_Write_TimH_TimHPort_Tim2Ccr2(1500);
+			HAL_TIM_PWM_Start_IT(&htim2, TIM_CHANNEL_1);
+			HAL_TIM_PWM_Start_IT(&htim2, TIM_CHANNEL_2);
+			TIM2->CCR1 = (750);
+			TIM2->CCR2 = (1500);
 			ExtLights_LowBeam_CurrentState = STD_LOW;
 			ExtLights_RearPositionLights_CurrentState = STD_LOW;
 			break;
@@ -586,8 +586,8 @@ VOID ExtLights_LightSwitchMode()
 			if(ExtLights_Previous_LightSwitchState != ExtLights_LightsSwitch_CurrentState)
 			{
 				ExtLights_Previous_LightSwitchState = ExtLights_LightsSwitch_CurrentState;
-				Rte_Write_TimH_TimHPort_Tim2Ccr1(0);
-				Rte_Write_TimH_TimHPort_Tim2Ccr2(0);
+				TIM2->CCR1 = (0);
+				TIM2->CCR2 = (0);
 				ExtLights_LowBeam_CurrentState = STD_LOW;
 				ExtLights_RearPositionLights_CurrentState = STD_LOW;
 			}
@@ -595,8 +595,8 @@ VOID ExtLights_LightSwitchMode()
 			{
 				/* do nothing */
 			}
-			Rte_Call_Tim_R_TimPort_HAL_TIM_PWM_Start_IT(Rte_P_Tim_TimPort_Htim2, Rte_P_Tim_TimPort_TimChannel1);
-			Rte_Call_Tim_R_TimPort_HAL_TIM_PWM_Start_IT(Rte_P_Tim_TimPort_Htim2, Rte_P_Tim_TimPort_TimChannel2);
+			HAL_TIM_PWM_Start_IT(&htim2, TIM_CHANNEL_1);
+			HAL_TIM_PWM_Start_IT(&htim2, TIM_CHANNEL_2);
 			ExtLights_LowBeam_CurrentState = STD_HIGH;
 			ExtLights_RearPositionLights_CurrentState = STD_HIGH;
 			break;
@@ -613,7 +613,7 @@ VOID ExtLights_LightSwitchMode()
 ************************************************************************************/
 VOID ExtLights_HighBeam(uint8 PinState)
 {
-	Rte_Call_Gpio_R_GpioPort_HAL_GPIO_WritePin(EXTLIGHTS_HIGHBEAM_PORT, EXTLIGHTS_HIGHBEAM_PIN, PinState);
+	HAL_GPIO_WritePin(EXTLIGHTS_HIGHBEAM_PORT, EXTLIGHTS_HIGHBEAM_PIN, PinState);
 }
 /***********************************************************************************
 * END OF ExtLights_HighBeam										   				   *													       																	   *
@@ -624,7 +624,7 @@ VOID ExtLights_HighBeam(uint8 PinState)
 ************************************************************************************/
 VOID ExtLights_ReverseLight(uint8 PinState)
 {
-	Rte_Call_Gpio_R_GpioPort_HAL_GPIO_WritePin(EXTLIGHTS_REVERSELIGHT_PORT, EXTLIGHTS_REVERSELIGHT_PIN, PinState);
+	HAL_GPIO_WritePin(EXTLIGHTS_REVERSELIGHT_PORT, EXTLIGHTS_REVERSELIGHT_PIN, PinState);
 }
 /***********************************************************************************
 * END OF ExtLights_ReverseLight										   			   *													       																	   *

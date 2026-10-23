@@ -44,8 +44,8 @@ _Min_Stack_Size = 0x400; /* required amount of stack */
 /* Memories definition */
 MEMORY
 {
-  RAM    (xrw)    : ORIGIN = 0x20000000,   LENGTH = 128K
-  FLASH    (rx)    : ORIGIN = 0x8000000,   LENGTH = 512K
+  RAM    (xrw)    : ORIGIN = 0x20000000,   LENGTH = 127K
+  FLASH    (rx)    : ORIGIN = 0x08020200, LENGTH = 0x3FE00
 }
 
 /* Sections */
@@ -173,13 +173,6 @@ SECTIONS
     . = ALIGN(8);
   } >RAM
 
-  /* Remove information from the compiler libraries */
-  /DISCARD/ :
-  {
-    libc.a ( * )
-    libm.a ( * )
-    libgcc.a ( * )
-  }
-
   .ARM.attributes 0 : { *(.ARM.attributes) }
 }
+ASSERT(ADDR(.isr_vector) == 0x08020200, "APP vector does not match image header")

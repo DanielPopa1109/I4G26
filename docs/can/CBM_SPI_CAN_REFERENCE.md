@@ -1,0 +1,7 @@
+> Historical audit/design baseline. Implementation status, partition and provisional transport assumptions below are superseded by [2026-10-19 closure](../modernization/G26_IMPLEMENTATION_CLOSURE.md), [current architecture](../autosar/BSW_ARCHITECTURE.md) and [final partition](../bootloader/FINAL_MEMORY_LAYOUT.md). This page is retained for reference; proposals are not proof of current behavior.
+
+# CBM SPI CAN reference
+
+Located at `D:\GitHub_Repos\F93\CBM - Central Body Module\CBM_APPL\BSW\Com\CanSpi`. `CanSpi.c/.h` implement MCP2515 register commands over `hspi1`; CS is GPIOC pin 4. `Core/Src/spi.c` configures SPI1 on PA5/PA6/PA7. Driver provides reset/read/write/bit-modify, config/normal/sleep mode transitions, acceptance masks/filters, three TX buffers, two RX buffers, status/error checks, and application CAN signal/diagnostic frame hooks. `CanSpi_MainFunction`, `CanSpi_Initialize`, `CanSpi_Transmit`, and `CanSpi_Receive` are the useful entry points.
+
+`CBM_APPL` has concrete integration code; `CBM_FBL` also has SPI and GPIO sources, but do not infer it has a complete CAN FBL transport from those filenames. Reuse concepts/register code only after license, API, electrical wiring, clock/bit-timing, mode, timeout and error-path audit. Code couples directly to CBM signals, DCM, EcuM and HAL globals; it is not a drop-in AUTOSAR Can driver. Polling SPI uses short timeouts; verify failure handling and shared bus ownership. Hardware requires MCP2515 plus separate physical transceiver and clock. MCP2515 is Classic CAN only (no CAN FD).

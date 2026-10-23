@@ -9,9 +9,10 @@
 *		INCLUDE PATHS					 *
 ******************************************/
 #include "UartH.h"
-#include "stdlib.h"
+#include "G26_CommandRx.h"
+static uint8 Uart_RxByte;
 
-#include "../../Rte/Rte.h"
+#include "App_Dependencies.h"
 /*****************************************
 *		END OF INCLUDE PATHS		     *
 ******************************************/
@@ -21,7 +22,6 @@
 /* Variable to store UART state. */
 uint32 Uart_BswState = STD_LOW;
 /* Variable for the bluetooth buffer size counter. */
-uint8 UartCounter_Btc_RxCount = STD_LOW;
 /*****************************************
 *		END OF VARIABLES				 *
 ******************************************/
@@ -47,6 +47,7 @@ VOID HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart);
 ************************************************************************************/
 StdReturnType Uart_Init()
 {
+    G26_CommandRxInit();
 	/* Set the instance. */
 	huart1.Instance = USART1;
 	/* Set the baud rate for the protocol. */
@@ -105,7 +106,7 @@ VOID Uart_MainFunction()
 			break;
 		case HAL_UART_STATE_READY:
 			/* Call for receiving data through uart for bluetooth communication. */
-			HAL_UART_Receive_IT(&huart1, &Rte_P_Btc_BtcPort_Btc_RxData, 1);
+			HAL_UART_Receive_IT(&huart1, &Uart_RxByte, 1);
 			Uart_BswState = localState;
 			break;
 		case HAL_UART_STATE_BUSY:
@@ -179,48 +180,12 @@ VOID HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
 ************************************************************************************/
 VOID HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
-	/* If the UART 1 is calling the callback. */
-	if(huart->Instance == USART1)
-	{
-		/* If the data received is not nullptr. */
-		if(Rte_P_Btc_BtcPort_Btc_RxData == '\n')
-		{
-			/* If the buffer length counter is less than maximum value. */
-			if(Rte_P_Btc_BtcPort_Btc_RxCount <= 3)
-			{
-				/* Convert the data received to uint8.*/
-				uint8 asciiToUint = 0;
-				asciiToUint = atoi((char*)Rte_P_Btc_BtcPort_Btc_DataBuffer);
-				Rte_Write_Btc_BtcPort_Btc_RxData(asciiToUint);
-				Rte_Write_Btc_BtcPort_Btc_ReceivedDataOnBluetooth(Rte_P_Btc_BtcPort_Btc_RxData);
-			}
-			else
-			{
-				/* do nothing */
-			}
-			/* Set the counter to 0 if it is more than maximum value. */
-			UartCounter_Btc_RxCount = 0;
-			Rte_Write_Btc_BtcPort_Btc_RxCount(UartCounter_Btc_RxCount);
-		}/* If the message was not fully processed, continue with the processing into the buffer. */
-		else if(Rte_P_Btc_BtcPort_Btc_RxCount < 3)
-		{
-			Rte_Write_Btc_BtcPort_Btc_DataBuffer(Rte_P_Btc_BtcPort_Btc_RxData, UartCounter_Btc_RxCount);
-			UartCounter_Btc_RxCount++;
-		}
-		else
-		{
-			/* Set the counter to 0 otherwise. */
-			UartCounter_Btc_RxCount = 0;
-			Rte_Write_Btc_BtcPort_Btc_RxCount(UartCounter_Btc_RxCount);
-		}
-		/* Re-enable data transmission throuhg the protocol in interrupt mode. */
-		HAL_UART_Receive_IT(&huart1, &Btc_RxData, 1);
-	}
-	else
-	{
-		/* do nothing */
-	}
+    if(huart->Instance==USART1){
+        G26_CommandRxByte(Uart_RxByte);
+        (void)HAL_UART_Receive_IT(&huart1,&Uart_RxByte,1);
+    }
 }
+
 /***********************************************************************************
 * END OF HAL_UART_RxCpltCallback										           *
 ************************************************************************************/

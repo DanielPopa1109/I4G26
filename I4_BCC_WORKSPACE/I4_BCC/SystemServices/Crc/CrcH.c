@@ -7,8 +7,16 @@
 /*****************************************
 *		INCLUDE PATHS					 *
 ******************************************/
-#include "Rte.h"
+#include "App_Dependencies.h"
 #include "CrcH.h"
+/* Both Bluetooth validation and the BSW task use the same CRC peripheral. */
+static uint32 Crc_CalculateProtected(CRC_HandleTypeDef *handle,uint32 *data,uint32 length)
+{
+    uint32 irq=__get_PRIMASK();__disable_irq();
+    uint32 result=HAL_CRC_Calculate(handle,data,length);
+    if(!irq)__enable_irq();
+    return result;
+}
 /*****************************************
 *		END OF INCLUDE PATHS		     *
 ******************************************/
@@ -114,17 +122,19 @@ StdReturnType Crc_VerifyUartData()
 	uint8 returnValue = E_OK;
 	/* Local variable to store received value. */
 	uint8 receivedValue = STD_LOW;
+	uint32 crcInput = STD_LOW;
 	/* Local value to calculate CRC. */
 	uint32 calculatedCrc = STD_LOW;
 	/* Read the received data from UART. */
-	Rte_Read_Btc_BtcPort_Btc_ReceivedDataOnBluetooth(&receivedValue);
+	receivedValue = Btc_ReceivedDataOnBluetooth;
+	crcInput = receivedValue;
 	Crc_BswState = CRC_VERIFYUARTDATA_STATE;
 	/* Calculate the CRC. */
-	calculatedCrc = HAL_CRC_Calculate(&hcrc, (uint32*)&receivedValue, 1);
+	calculatedCrc = Crc_CalculateProtected(&hcrc, &crcInput, 1);
 	/* Check the value if it has correct CRC. */
 	switch(receivedValue)
 	{
-		case RTE_P_BTC_RX_EXTLIGHTS_REVERSELIGHT_ON:
+		case BTC_RX_EXTLIGHTS_REVERSELIGHT_ON:
 			if(calculatedCrc == Crc_ExtLights_ReverseLight_On)
 			{
 				returnValue = E_OK;
@@ -134,7 +144,7 @@ StdReturnType Crc_VerifyUartData()
 				returnValue = E_NOT_OK;
 			}
 			break;
-		case RTE_P_BTC_RX_EXTLIGHTS_REVERSELIGHT_OFF:
+		case BTC_RX_EXTLIGHTS_REVERSELIGHT_OFF:
 			if(calculatedCrc == Crc_ExtLights_ReverseLight_Off)
 			{
 				returnValue = E_OK;
@@ -144,7 +154,7 @@ StdReturnType Crc_VerifyUartData()
 				returnValue = E_NOT_OK;
 			}
 			break;
-		case RTE_P_BTC_RX_EXTLIGHTS_POSITIONZERO:
+		case BTC_RX_EXTLIGHTS_POSITIONZERO:
 			if(calculatedCrc == Crc_ExtLights_PositionZero)
 			{
 				returnValue = E_OK;
@@ -154,7 +164,7 @@ StdReturnType Crc_VerifyUartData()
 				returnValue = E_NOT_OK;
 			}
 			break;
-		case RTE_P_BTC_RX_EXTLIGHTS_AUTOMATICLIGHTS:
+		case BTC_RX_EXTLIGHTS_AUTOMATICLIGHTS:
 			if(calculatedCrc == Crc_ExtLights_AutomaticLights)
 			{
 				returnValue = E_OK;
@@ -164,7 +174,7 @@ StdReturnType Crc_VerifyUartData()
 				returnValue = E_NOT_OK;
 			}
 			break;
-		case RTE_P_BTC_RX_EXTLIGHTS_POSITIONLIGHTS:
+		case BTC_RX_EXTLIGHTS_POSITIONLIGHTS:
 			if(calculatedCrc == Crc_ExtLights_PositionLights)
 			{
 				returnValue = E_OK;
@@ -174,7 +184,7 @@ StdReturnType Crc_VerifyUartData()
 				returnValue = E_NOT_OK;
 			}
 			break;
-		case RTE_P_BTC_RX_EXTLIGHTS_NIGHTTIMELIGHTS:
+		case BTC_RX_EXTLIGHTS_NIGHTTIMELIGHTS:
 			if(calculatedCrc == Crc_ExtLights_NightTimeLights)
 			{
 				returnValue = E_OK;
@@ -184,7 +194,7 @@ StdReturnType Crc_VerifyUartData()
 				returnValue = E_NOT_OK;
 			}
 			break;
-		case RTE_P_BTC_RX_CENLOC_ON:
+		case BTC_RX_CENLOC_ON:
 			if(calculatedCrc == Crc_CenLoc_On)
 			{
 				returnValue = E_OK;
@@ -194,7 +204,7 @@ StdReturnType Crc_VerifyUartData()
 				returnValue = E_NOT_OK;
 			}
 			break;
-		case RTE_P_BTC_RX_CENLOC_OFF:
+		case BTC_RX_CENLOC_OFF:
 			if(calculatedCrc == Crc_CenLoc_Off)
 			{
 				returnValue = E_OK;
@@ -204,7 +214,7 @@ StdReturnType Crc_VerifyUartData()
 				returnValue = E_NOT_OK;
 			}
 			break;
-		case RTE_P_BTC_RX_EXTLIGHTS_HIGHBEAM_ON:
+		case BTC_RX_EXTLIGHTS_HIGHBEAM_ON:
 			if(calculatedCrc == Crc_ExtLights_HighBeam_On)
 			{
 				returnValue = E_OK;
@@ -214,7 +224,7 @@ StdReturnType Crc_VerifyUartData()
 				returnValue = E_NOT_OK;
 			}
 			break;
-		case RTE_P_BTC_RX_EXTLIGHTS_HIGHBEAM_OFF:
+		case BTC_RX_EXTLIGHTS_HIGHBEAM_OFF:
 			if(calculatedCrc == Crc_ExtLights_HighBeam_Off)
 			{
 				returnValue = E_OK;
@@ -224,7 +234,7 @@ StdReturnType Crc_VerifyUartData()
 				returnValue = E_NOT_OK;
 			}
 			break;
-		case RTE_P_BTC_RX_EXTLIGHTS_TURNSIGNALLEFT_ON:
+		case BTC_RX_EXTLIGHTS_TURNSIGNALLEFT_ON:
 			if(calculatedCrc == Crc_ExtLights_TurnSignalLeft_On)
 			{
 				returnValue = E_OK;
@@ -234,7 +244,7 @@ StdReturnType Crc_VerifyUartData()
 				returnValue = E_NOT_OK;
 			}
 			break;
-		case RTE_P_BTC_RX_EXTLIGHTS_TURNSIGNALLEFT_OFF:
+		case BTC_RX_EXTLIGHTS_TURNSIGNALLEFT_OFF:
 			if(calculatedCrc == Crc_ExtLights_TurnSignalLeft_Off)
 			{
 				returnValue = E_OK;
@@ -244,7 +254,7 @@ StdReturnType Crc_VerifyUartData()
 				returnValue = E_NOT_OK;
 			}
 			break;
-		case RTE_P_BTC_RX_EXTLIGHTS_TURNSIGNALRIGHT_ON:
+		case BTC_RX_EXTLIGHTS_TURNSIGNALRIGHT_ON:
 			if(calculatedCrc == Crc_ExtLights_TurnSignalRight_On)
 			{
 				returnValue = E_OK;
@@ -254,7 +264,7 @@ StdReturnType Crc_VerifyUartData()
 				returnValue = E_NOT_OK;
 			}
 			break;
-		case RTE_P_BTC_RX_EXTLIGHTS_TURNSIGNALRIGHT_OFF:
+		case BTC_RX_EXTLIGHTS_TURNSIGNALRIGHT_OFF:
 			if(calculatedCrc == Crc_ExtLights_TurnSignalRight_Off)
 			{
 				returnValue = E_OK;
@@ -264,7 +274,7 @@ StdReturnType Crc_VerifyUartData()
 				returnValue = E_NOT_OK;
 			}
 			break;
-		case RTE_P_BTC_RX_EXTLIGHTS_HAZARDLIGHT_ON:
+		case BTC_RX_EXTLIGHTS_HAZARDLIGHT_ON:
 			if(calculatedCrc == Crc_ExtLights_HazardLight_On)
 			{
 				returnValue = E_OK;
@@ -274,7 +284,7 @@ StdReturnType Crc_VerifyUartData()
 				returnValue = E_NOT_OK;
 			}
 			break;
-		case RTE_P_BTC_RX_EXTLIGHTS_HAZARDLIGHT_OFF:
+		case BTC_RX_EXTLIGHTS_HAZARDLIGHT_OFF:
 			if(calculatedCrc == Crc_ExtLights_HazardLight_Off)
 			{
 				returnValue = E_OK;
@@ -284,7 +294,7 @@ StdReturnType Crc_VerifyUartData()
 				returnValue = E_NOT_OK;
 			}
 			break;
-		case RTE_P_BTC_RX_EXTLIGHTS_FOGLIGHTFRONT_ON:
+		case BTC_RX_EXTLIGHTS_FOGLIGHTFRONT_ON:
 			if(calculatedCrc == Crc_ExtLights_FogLightFront_On)
 			{
 				returnValue = E_OK;
@@ -294,7 +304,7 @@ StdReturnType Crc_VerifyUartData()
 				returnValue = E_NOT_OK;
 			}
 			break;
-		case RTE_P_BTC_RX_EXTLIGHTS_FOGLIGHTFRONT_OFF:
+		case BTC_RX_EXTLIGHTS_FOGLIGHTFRONT_OFF:
 			if(calculatedCrc == Crc_ExtLights_FogLightFront_Off)
 			{
 				returnValue = E_OK;
@@ -304,7 +314,7 @@ StdReturnType Crc_VerifyUartData()
 				returnValue = E_NOT_OK;
 			}
 			break;
-		case RTE_P_BTC_RX_EXTLIGHTS_FOGLIGHTREAR_ON:
+		case BTC_RX_EXTLIGHTS_FOGLIGHTREAR_ON:
 			if(calculatedCrc == Crc_ExtLights_FogLightRear_On)
 			{
 				returnValue = E_OK;
@@ -314,7 +324,7 @@ StdReturnType Crc_VerifyUartData()
 				returnValue = E_NOT_OK;
 			}
 			break;
-		case RTE_P_BTC_RX_EXTLIGHTS_FOGLIGHTREAR_OFF:
+		case BTC_RX_EXTLIGHTS_FOGLIGHTREAR_OFF:
 			if(calculatedCrc == Crc_ExtLights_FogLightRear_Off)
 			{
 				returnValue = E_OK;
@@ -324,7 +334,7 @@ StdReturnType Crc_VerifyUartData()
 				returnValue = E_NOT_OK;
 			}
 			break;
-		case RTE_P_BTC_RX_EXTLIGHTS_BRAKELIGHTON:
+		case BTC_RX_EXTLIGHTS_BRAKELIGHTON:
 			if(calculatedCrc == Crc_ExtLights_BrakeLight_On)
 			{
 				returnValue = E_OK;
@@ -334,7 +344,7 @@ StdReturnType Crc_VerifyUartData()
 				returnValue = E_NOT_OK;
 			}
 			break;
-		case RTE_P_BTC_RX_EXTLIGHTS_BRAKELIGHTOFF:
+		case BTC_RX_EXTLIGHTS_BRAKELIGHTOFF:
 			if(calculatedCrc == Crc_ExtLights_BrakeLight_Off)
 			{
 				returnValue = E_OK;
@@ -344,7 +354,7 @@ StdReturnType Crc_VerifyUartData()
 				returnValue = E_NOT_OK;
 			}
 			break;
-		case RTE_P_BTC_RX_INTLIGHTS_INTERIORLIGHT_ON:
+		case BTC_RX_INTLIGHTS_INTERIORLIGHT_ON:
 			if(calculatedCrc == Crc_IntLights_InteriorLight_On)
 			{
 				returnValue = E_OK;
@@ -354,7 +364,7 @@ StdReturnType Crc_VerifyUartData()
 				returnValue = E_NOT_OK;
 			}
 			break;
-		case RTE_P_BTC_RX_INTLIGHTS_INTERIORLIGHT_OFF:
+		case BTC_RX_INTLIGHTS_INTERIORLIGHT_OFF:
 			if(calculatedCrc == Crc_IntLights_InteriorLights_Off)
 			{
 				returnValue = E_OK;
@@ -382,54 +392,54 @@ VOID Crc_InitCrcValuesForUart()
 	 * received data from UART. */
 	uint32 value = 0;
 	/* Calculate CRC for each defined bluetooth command. */
-	value = RTE_P_BTC_RX_EXTLIGHTS_FOGLIGHTREAR_ON;
-	Crc_ExtLights_FogLightRear_On = HAL_CRC_Calculate(&hcrc, &value, 1);
-	value = RTE_P_BTC_RX_EXTLIGHTS_FOGLIGHTREAR_OFF;
-	Crc_ExtLights_FogLightRear_Off = HAL_CRC_Calculate(&hcrc, &value, 1);
-	value = RTE_P_BTC_RX_CENLOC_ON;
-	Crc_CenLoc_On = HAL_CRC_Calculate(&hcrc, &value, 1);
-	value = RTE_P_BTC_RX_CENLOC_OFF;
-	Crc_CenLoc_Off = HAL_CRC_Calculate(&hcrc, &value, 1);
-	value = RTE_P_BTC_RX_EXTLIGHTS_HIGHBEAM_ON;
-	Crc_ExtLights_HighBeam_On = HAL_CRC_Calculate(&hcrc, &value, 1);
-	value = RTE_P_BTC_RX_EXTLIGHTS_HIGHBEAM_OFF;
-	Crc_ExtLights_HighBeam_Off = HAL_CRC_Calculate(&hcrc, &value, 1);
-	value = RTE_P_BTC_RX_EXTLIGHTS_TURNSIGNALLEFT_ON;
-	Crc_ExtLights_TurnSignalLeft_On = HAL_CRC_Calculate(&hcrc, &value, 1);
-	value = RTE_P_BTC_RX_EXTLIGHTS_TURNSIGNALLEFT_OFF;
-	Crc_ExtLights_TurnSignalLeft_Off = HAL_CRC_Calculate(&hcrc, &value, 1);
-	value = RTE_P_BTC_RX_EXTLIGHTS_TURNSIGNALRIGHT_ON;
-	Crc_ExtLights_TurnSignalRight_On = HAL_CRC_Calculate(&hcrc, &value, 1);
-	value = RTE_P_BTC_RX_EXTLIGHTS_TURNSIGNALRIGHT_OFF;
-	Crc_ExtLights_TurnSignalRight_Off = HAL_CRC_Calculate(&hcrc, &value, 1);
-	value = RTE_P_BTC_RX_EXTLIGHTS_HAZARDLIGHT_ON;
-	Crc_ExtLights_HazardLight_On = HAL_CRC_Calculate(&hcrc, &value, 1);
-	value = RTE_P_BTC_RX_EXTLIGHTS_HAZARDLIGHT_OFF;
-	Crc_ExtLights_HazardLight_Off = HAL_CRC_Calculate(&hcrc, &value, 1);
-	value = RTE_P_BTC_RX_EXTLIGHTS_FOGLIGHTFRONT_ON;
-	Crc_ExtLights_FogLightFront_On = HAL_CRC_Calculate(&hcrc, &value, 1);
-	value = RTE_P_BTC_RX_EXTLIGHTS_FOGLIGHTFRONT_OFF;
-	Crc_ExtLights_FogLightFront_Off = HAL_CRC_Calculate(&hcrc, &value, 1);
-	value = RTE_P_BTC_RX_EXTLIGHTS_BRAKELIGHTON;
-	Crc_ExtLights_BrakeLight_On = HAL_CRC_Calculate(&hcrc, &value, 1);
-	value = RTE_P_BTC_RX_EXTLIGHTS_BRAKELIGHTOFF;
-	Crc_ExtLights_BrakeLight_Off = HAL_CRC_Calculate(&hcrc, &value, 1);
-	value = RTE_P_BTC_RX_EXTLIGHTS_REVERSELIGHT_ON;
-	Crc_ExtLights_ReverseLight_On = HAL_CRC_Calculate(&hcrc, &value, 1);
-	value = RTE_P_BTC_RX_EXTLIGHTS_REVERSELIGHT_OFF;
-	Crc_ExtLights_ReverseLight_Off = HAL_CRC_Calculate(&hcrc, &value, 1);
-	value = RTE_P_BTC_RX_EXTLIGHTS_POSITIONZERO;
-	Crc_ExtLights_PositionZero = HAL_CRC_Calculate(&hcrc, &value, 1);
-	value = RTE_P_BTC_RX_EXTLIGHTS_AUTOMATICLIGHTS;
-	Crc_ExtLights_AutomaticLights = HAL_CRC_Calculate(&hcrc, &value, 1);
-	value = RTE_P_BTC_RX_EXTLIGHTS_POSITIONLIGHTS;
-	Crc_ExtLights_PositionLights = HAL_CRC_Calculate(&hcrc, &value, 1);
-	value = RTE_P_BTC_RX_EXTLIGHTS_NIGHTTIMELIGHTS;
-	Crc_ExtLights_NightTimeLights = HAL_CRC_Calculate(&hcrc, &value, 1);
-	value = RTE_P_BTC_RX_INTLIGHTS_INTERIORLIGHT_ON;
-	Crc_IntLights_InteriorLight_On = HAL_CRC_Calculate(&hcrc, &value, 1);
-	value = RTE_P_BTC_RX_INTLIGHTS_INTERIORLIGHT_OFF;
-	Crc_IntLights_InteriorLights_Off = HAL_CRC_Calculate(&hcrc, &value, 1);
+	value = BTC_RX_EXTLIGHTS_FOGLIGHTREAR_ON;
+	Crc_ExtLights_FogLightRear_On = Crc_CalculateProtected(&hcrc, &value, 1);
+	value = BTC_RX_EXTLIGHTS_FOGLIGHTREAR_OFF;
+	Crc_ExtLights_FogLightRear_Off = Crc_CalculateProtected(&hcrc, &value, 1);
+	value = BTC_RX_CENLOC_ON;
+	Crc_CenLoc_On = Crc_CalculateProtected(&hcrc, &value, 1);
+	value = BTC_RX_CENLOC_OFF;
+	Crc_CenLoc_Off = Crc_CalculateProtected(&hcrc, &value, 1);
+	value = BTC_RX_EXTLIGHTS_HIGHBEAM_ON;
+	Crc_ExtLights_HighBeam_On = Crc_CalculateProtected(&hcrc, &value, 1);
+	value = BTC_RX_EXTLIGHTS_HIGHBEAM_OFF;
+	Crc_ExtLights_HighBeam_Off = Crc_CalculateProtected(&hcrc, &value, 1);
+	value = BTC_RX_EXTLIGHTS_TURNSIGNALLEFT_ON;
+	Crc_ExtLights_TurnSignalLeft_On = Crc_CalculateProtected(&hcrc, &value, 1);
+	value = BTC_RX_EXTLIGHTS_TURNSIGNALLEFT_OFF;
+	Crc_ExtLights_TurnSignalLeft_Off = Crc_CalculateProtected(&hcrc, &value, 1);
+	value = BTC_RX_EXTLIGHTS_TURNSIGNALRIGHT_ON;
+	Crc_ExtLights_TurnSignalRight_On = Crc_CalculateProtected(&hcrc, &value, 1);
+	value = BTC_RX_EXTLIGHTS_TURNSIGNALRIGHT_OFF;
+	Crc_ExtLights_TurnSignalRight_Off = Crc_CalculateProtected(&hcrc, &value, 1);
+	value = BTC_RX_EXTLIGHTS_HAZARDLIGHT_ON;
+	Crc_ExtLights_HazardLight_On = Crc_CalculateProtected(&hcrc, &value, 1);
+	value = BTC_RX_EXTLIGHTS_HAZARDLIGHT_OFF;
+	Crc_ExtLights_HazardLight_Off = Crc_CalculateProtected(&hcrc, &value, 1);
+	value = BTC_RX_EXTLIGHTS_FOGLIGHTFRONT_ON;
+	Crc_ExtLights_FogLightFront_On = Crc_CalculateProtected(&hcrc, &value, 1);
+	value = BTC_RX_EXTLIGHTS_FOGLIGHTFRONT_OFF;
+	Crc_ExtLights_FogLightFront_Off = Crc_CalculateProtected(&hcrc, &value, 1);
+	value = BTC_RX_EXTLIGHTS_BRAKELIGHTON;
+	Crc_ExtLights_BrakeLight_On = Crc_CalculateProtected(&hcrc, &value, 1);
+	value = BTC_RX_EXTLIGHTS_BRAKELIGHTOFF;
+	Crc_ExtLights_BrakeLight_Off = Crc_CalculateProtected(&hcrc, &value, 1);
+	value = BTC_RX_EXTLIGHTS_REVERSELIGHT_ON;
+	Crc_ExtLights_ReverseLight_On = Crc_CalculateProtected(&hcrc, &value, 1);
+	value = BTC_RX_EXTLIGHTS_REVERSELIGHT_OFF;
+	Crc_ExtLights_ReverseLight_Off = Crc_CalculateProtected(&hcrc, &value, 1);
+	value = BTC_RX_EXTLIGHTS_POSITIONZERO;
+	Crc_ExtLights_PositionZero = Crc_CalculateProtected(&hcrc, &value, 1);
+	value = BTC_RX_EXTLIGHTS_AUTOMATICLIGHTS;
+	Crc_ExtLights_AutomaticLights = Crc_CalculateProtected(&hcrc, &value, 1);
+	value = BTC_RX_EXTLIGHTS_POSITIONLIGHTS;
+	Crc_ExtLights_PositionLights = Crc_CalculateProtected(&hcrc, &value, 1);
+	value = BTC_RX_EXTLIGHTS_NIGHTTIMELIGHTS;
+	Crc_ExtLights_NightTimeLights = Crc_CalculateProtected(&hcrc, &value, 1);
+	value = BTC_RX_INTLIGHTS_INTERIORLIGHT_ON;
+	Crc_IntLights_InteriorLight_On = Crc_CalculateProtected(&hcrc, &value, 1);
+	value = BTC_RX_INTLIGHTS_INTERIORLIGHT_OFF;
+	Crc_IntLights_InteriorLights_Off = Crc_CalculateProtected(&hcrc, &value, 1);
 }
 /***********************************************************************************
 * END OF Btc_IgnitionState											  			   *													       																	   *

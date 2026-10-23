@@ -9,7 +9,7 @@
 #include "SecAlm.h"
 #include "PortH.h"
 
-#include "../../Rte/Rte.h"
+#include "App_Dependencies.h"
 /*****************************************
 		END OF INCLUDE PATHS		     *
 ******************************************/
@@ -87,8 +87,8 @@ VOID SecAlm_LightsBuzzerControl()
 	if(SecAlm_TriggerIRQCounterForTimer4 >= 20)
 	{
 		SecAlm_TriggerPreviousState 						= SecAlm_Trigger;
-		Rte_P_CenLoc_CenLocPort_CenLoc_CyclicAlarmCounter	= STD_HIGH;
-		Rte_P_CenLoc_CenLocPort_CenLoc_TurnOnLedCounter 	= STD_LOW;
+		CenLoc_CyclicAlarmCounter	= STD_HIGH;
+		CenLoc_TurnOnLedCounter 	= STD_LOW;
 		SecAlm_Trigger 										= STD_LOW;
 		SecAlm_PinStateChange 								= STD_LOW;
 		SecAlm_TriggerIRQCounterForTimer4 					= STD_LOW;
@@ -96,7 +96,7 @@ VOID SecAlm_LightsBuzzerControl()
 		SecAlm_SensorStatus 								= STD_LOW;
 		SecAlm_SensorStatusCounter 							= STD_LOW;
 		/* Stop the os timer assigned to security alarm trigger. */
-		Rte_Call_OsTimer_R_OsTimerPort_OsTimerStop(Os_SecAlmAlarm_TimerHandle);
+		osTimerStop(Os_SecAlmAlarm_TimerHandle);
 		/* Turn off the lights to make sure their state is off before any other action. */
 		SecAlm_TurnOnExtLights();
 	}
@@ -131,9 +131,9 @@ VOID SecAlm_LightsBuzzerControl()
 	{
 		SecAlm_ToggleAlarmLed(STD_LOW);
 		/* One alarm cycle is performed consisting of 10 seconds. */
-		if(Rte_Call_Os_R_OsPort_OsTimerIsRunning(Os_SecAlmAlarm_TimerHandle) == 0)
+		if(osTimerIsRunning(Os_SecAlmAlarm_TimerHandle) == 0)
 		{
-			Rte_Call_OsTimer_R_OsTimerPort_OsTimerStart(Os_SecAlmAlarm_TimerHandle, 500);
+			osTimerStart(Os_SecAlmAlarm_TimerHandle, 500);
 		}
 		else
 		{
@@ -177,14 +177,14 @@ StdReturnType SecAlm_VibSenStatus()
 	/* Local variable for sensor status. */
 	uint16 sensorStatus = STD_LOW;
 	/* Read the sensor value. */
-	Rte_Call_SenCtrl_P_SenCtrlPort_SenCtrl_ProcessSensorValue(SECALM_VS_REQUEST);
+	SenCtrl_ProcessSensorValue(SECALM_VS_REQUEST);
 	/* If the sensor was triggered. */
 	if(SecAlm_SensorState == STD_HIGH)
 	{
 		/* Count for how long it has been triggered. */
 		SecAlm_SensorStatusCounter = SecAlm_SensorStatusCounter + 1;
 		/* Start the reset timer for the counter variable. */
-		Rte_Call_OsTimer_R_OsTimerPort_OsTimerStart(Os_SecAlm_AlarmResetHandle, 10000);
+		osTimerStart(Os_SecAlm_AlarmResetHandle, 10000);
 	}
 	else
 	{
@@ -220,21 +220,21 @@ VOID SecAlm_TurnOnExtLights()
 	/* Turn on the lights and the buzzer. */
 	if(SecAlm_PinStateChange == STD_HIGH)
 	{
-		Rte_Call_Tim_R_TimPort_HAL_TIM_PWM_Start_IT(Rte_P_Tim_TimPort_Htim2, Rte_P_Tim_TimPort_TimChannel1);
-		Rte_Call_Tim_R_TimPort_HAL_TIM_PWM_Start_IT(Rte_P_Tim_TimPort_Htim2, Rte_P_Tim_TimPort_TimChannel2);
-		Rte_Call_Tim_R_TimPort_HAL_TIM_PWM_Start_IT(Rte_P_Tim_TimPort_Htim3, Rte_P_Tim_TimPort_TimChannel3);
-		Rte_Call_Tim_R_TimPort_HAL_TIM_PWM_Start_IT(Rte_P_Tim_TimPort_Htim3, Rte_P_Tim_TimPort_TimChannel4);
-		Rte_Call_Tim_R_TimPort_HAL_TIM_PWM_Start_IT(Rte_P_Tim_TimPort_Htim4, Rte_P_Tim_TimPort_TimChannel3);
-		Rte_Call_Tim_R_TimPort_HAL_TIM_PWM_Start_IT(Rte_P_Tim_TimPort_Htim4, Rte_P_Tim_TimPort_TimChannel4);
+		HAL_TIM_PWM_Start_IT(&htim2, TIM_CHANNEL_1);
+		HAL_TIM_PWM_Start_IT(&htim2, TIM_CHANNEL_2);
+		HAL_TIM_PWM_Start_IT(&htim3, TIM_CHANNEL_3);
+		HAL_TIM_PWM_Start_IT(&htim3, TIM_CHANNEL_4);
+		HAL_TIM_PWM_Start_IT(&htim4, TIM_CHANNEL_3);
+		HAL_TIM_PWM_Start_IT(&htim4, TIM_CHANNEL_4);
 	}
 	else if(SecAlm_PinStateChange == STD_LOW)
 	{
-		Rte_Call_Tim_R_TimPort_HAL_TIM_PWM_Stop_IT(Rte_P_Tim_TimPort_Htim2, Rte_P_Tim_TimPort_TimChannel1);
-		Rte_Call_Tim_R_TimPort_HAL_TIM_PWM_Stop_IT(Rte_P_Tim_TimPort_Htim2, Rte_P_Tim_TimPort_TimChannel2);
-		Rte_Call_Tim_R_TimPort_HAL_TIM_PWM_Stop_IT(Rte_P_Tim_TimPort_Htim3, Rte_P_Tim_TimPort_TimChannel3);
-		Rte_Call_Tim_R_TimPort_HAL_TIM_PWM_Stop_IT(Rte_P_Tim_TimPort_Htim3, Rte_P_Tim_TimPort_TimChannel4);
-		Rte_Call_Tim_R_TimPort_HAL_TIM_PWM_Stop_IT(Rte_P_Tim_TimPort_Htim4, Rte_P_Tim_TimPort_TimChannel3);
-		Rte_Call_Tim_R_TimPort_HAL_TIM_PWM_Stop_IT(Rte_P_Tim_TimPort_Htim4, Rte_P_Tim_TimPort_TimChannel4);
+		HAL_TIM_PWM_Stop_IT(&htim2, TIM_CHANNEL_1);
+		HAL_TIM_PWM_Stop_IT(&htim2, TIM_CHANNEL_2);
+		HAL_TIM_PWM_Stop_IT(&htim3, TIM_CHANNEL_3);
+		HAL_TIM_PWM_Stop_IT(&htim3, TIM_CHANNEL_4);
+		HAL_TIM_PWM_Stop_IT(&htim4, TIM_CHANNEL_3);
+		HAL_TIM_PWM_Stop_IT(&htim4, TIM_CHANNEL_4);
 	}
 	SecAlm_ToggleAlarmBuzzer(SecAlm_PinStateChange);
 }
@@ -277,7 +277,7 @@ StdReturnType SecAlm_Init()
 ************************************************************************************/
 VOID SecAlm_ToggleAlarmBuzzer(uint8 PinState)
 {
-	Rte_Call_Gpio_R_GpioPort_HAL_GPIO_WritePin(SECALM_BUZZER_PORT, SECALM_BUZZER_PIN, PinState);
+	HAL_GPIO_WritePin(SECALM_BUZZER_PORT, SECALM_BUZZER_PIN, PinState);
 }
 /***********************************************************************************
 * END OF SecAlm_ToggleAlarmBuzzer										           *
@@ -288,7 +288,7 @@ VOID SecAlm_ToggleAlarmBuzzer(uint8 PinState)
 ************************************************************************************/
 VOID SecAlm_ToggleAlarmLed(uint8 PinState)
 {
-	Rte_Call_Gpio_R_GpioPort_HAL_GPIO_WritePin(SECALM_LED_PORT, SECALM_LED_PIN, PinState);
+	HAL_GPIO_WritePin(SECALM_LED_PORT, SECALM_LED_PIN, PinState);
 }
 /***********************************************************************************
 * END OF SecAlm_ToggleAlarmLed										               *

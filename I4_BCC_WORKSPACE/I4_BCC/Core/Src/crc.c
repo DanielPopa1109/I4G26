@@ -18,7 +18,7 @@
   */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
-#include "crc.h"
+#include "../Inc/crc.h"
 
 /* USER CODE BEGIN 0 */
 

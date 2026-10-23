@@ -1,0 +1,12 @@
+#ifndef G26_APP_TEST_DEPENDENCIES_H
+#define G26_APP_TEST_DEPENDENCIES_H
+#include <stdint.h>
+extern uint8_t CenLoc_CurrentState;
+extern uint8_t ExtLights_HighBeam_CurrentState;
+extern uint8_t ExtLights_TurnSignalLeft_CurrentState;
+extern uint8_t ExtLights_TurnSignalRight_CurrentState;
+extern uint8_t ExtLights_HazardLight_CurrentState;
+extern uint8_t ExtLights_FrontFogLight_CurrentState;
+extern uint8_t ExtLights_RearFogLight_CurrentState;
+extern uint8_t Dem_DtcArray[8];
+#endif

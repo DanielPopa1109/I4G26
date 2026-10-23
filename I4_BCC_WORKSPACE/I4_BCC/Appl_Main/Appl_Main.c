@@ -16,6 +16,8 @@
 ************************************************************************************/
 int main()
 {
+	/* FBL hands over with IRQs masked until application C startup completes. */
+	__enable_irq();
 	/* Calls for system initialization. */
 	SystemManager_Init();
 	/* Initialize the kernel of FreeRTOS. */

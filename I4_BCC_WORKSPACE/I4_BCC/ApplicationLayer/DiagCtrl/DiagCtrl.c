@@ -7,7 +7,7 @@
 *		INCLUDE PATHS					 *
 ******************************************/
 #include "DiagCtrl.h"
-#include "Rte.h"
+#include "App_Dependencies.h"
 /*****************************************
 *		END OF INCLUDE PATHS		     *
 ******************************************/
@@ -60,55 +60,20 @@ VOID DiagCtrl_ProcessRequestedData()
 	static uint8 BtcUart_FaultValue_Two = 0;
 	static uint8 BtcUart_FaultValue_Three = 0;
 	static uint8 BtcUart_FaultValue_Four = 0;
-	Rte_Read_Adc_AdcPort_Adc_ChannelOne_Buffer(&LightSensor_RequestedValue, 0);
-	Rte_Read_Adc_AdcPort_Adc_ChannelOne_Buffer(&VibrationSensor_RequestedValue, 1);
-	Rte_Read_SystemManager_SystemManagerPort_SystemManager_Fault(&BtcUart_FaultValue_One, 17);
-	Rte_Read_SystemManager_SystemManagerPort_SystemManager_Fault(&BtcUart_FaultValue_Two, 18);
-	Rte_Read_SystemManager_SystemManagerPort_SystemManager_Fault(&BtcUart_FaultValue_Three, 19);
-	Rte_Read_SystemManager_SystemManagerPort_SystemManager_Fault(&BtcUart_FaultValue_Four, 20);
-	if(BtcUart_FaultValue_One != 0 ||
-			BtcUart_FaultValue_Two != 0 ||
-			BtcUart_FaultValue_Three != 0 ||
-			BtcUart_FaultValue_Four != 0)
-	{
-		Rte_Call_Dem_P_DemPort_Dem_ReceiveFault(DIAGCTRL_BLUETOOTH_MODULE_MALFUNCTION);
-	}
-	else
-	{
-		/* do nothing */
-	}
-	if(LightSensor_RequestedValue < 100)
-	{
-		Rte_Call_Dem_P_DemPort_Dem_ReceiveFault(DIAGCTRL_LIGHT_SENSOR_MALFUNCTION);
-	}
-	else
-	{
-		/* do nothing */
-	}
-	if(VibrationSensor_RequestedValue < 100)
-	{
-		Rte_Call_Dem_P_DemPort_Dem_ReceiveFault(DIAGCTRL_VIBRATION_SENSOR_MALFUNCTION);
-	}
-	else
-	{
-		/* do nothing */
-	}
-	if(Rte_P_Tim_TimPort_Tim5_CalculatedDistance_ChannelThree == 0)
-	{
-		Rte_Call_Dem_P_DemPort_Dem_ReceiveFault(DIAGCTRL_FRONT_PARKING_DISTANCE_SENSOR_MALFUNCTION);
-	}
-	else
-	{
-		/* do nothing */
-	}
-	if(Rte_P_Tim_TimPort_Tim5_CalculatedDistance_ChannelFour == 0)
-	{
-		Rte_Call_Dem_P_DemPort_Dem_ReceiveFault(DIAGCTRL_REAR_PARKING_DISTANCE_SENSOR_MALFUNCTION);
-	}
-	else
-	{
-		/* do nothing */
-	}
+	LightSensor_RequestedValue = Adc_ChannelOne_Buffer[(0)];
+	VibrationSensor_RequestedValue = Adc_ChannelOne_Buffer[(1)];
+	BtcUart_FaultValue_One = SystemManager_Fault[(17)];
+	BtcUart_FaultValue_Two = SystemManager_Fault[(18)];
+	BtcUart_FaultValue_Three = SystemManager_Fault[(19)];
+	BtcUart_FaultValue_Four = SystemManager_Fault[(20)];
+	(void)Dem_SetEventStatus(DIAGCTRL_BLUETOOTH_MODULE_MALFUNCTION,
+        (BtcUart_FaultValue_One || BtcUart_FaultValue_Two || BtcUart_FaultValue_Three || BtcUart_FaultValue_Four)?DEM_EVENT_STATUS_PREFAILED:DEM_EVENT_STATUS_PREPASSED);
+    (void)Dem_SetEventStatus(DIAGCTRL_LIGHT_SENSOR_MALFUNCTION,LightSensor_RequestedValue<100?DEM_EVENT_STATUS_PREFAILED:DEM_EVENT_STATUS_PREPASSED);
+    (void)Dem_SetEventStatus(DIAGCTRL_VIBRATION_SENSOR_MALFUNCTION,VibrationSensor_RequestedValue<100?DEM_EVENT_STATUS_PREFAILED:DEM_EVENT_STATUS_PREPASSED);
+    (void)Dem_SetEventStatus(DIAGCTRL_FRONT_PARKING_DISTANCE_SENSOR_MALFUNCTION,
+        (Tim5_CalculatedDistance_ChannelThree==0 && ExtLights_ReverseLight_CurrentState!=STD_LOW)?DEM_EVENT_STATUS_PREFAILED:DEM_EVENT_STATUS_PREPASSED);
+    (void)Dem_SetEventStatus(DIAGCTRL_REAR_PARKING_DISTANCE_SENSOR_MALFUNCTION,
+        (Tim5_CalculatedDistance_ChannelFour==0 && ExtLights_ReverseLight_CurrentState!=STD_LOW)?DEM_EVENT_STATUS_PREFAILED:DEM_EVENT_STATUS_PREPASSED);
 }
 /***********************************************************************************
 * END OF DiagCtrl_ProcessRequestedData										       *

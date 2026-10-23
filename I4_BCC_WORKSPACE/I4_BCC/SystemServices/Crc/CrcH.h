@@ -10,7 +10,8 @@
 *		INCLUDE PATHS					 *
 ******************************************/
 #include "Std_Types.h"
-#include "crc.h"
+#include "../../Core/Inc/crc.h"
+#include "../../Core/Inc/crc.h"
 /*****************************************
 *		END OF INCLUDE PATHS		     *
 ******************************************/

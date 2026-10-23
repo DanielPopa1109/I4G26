@@ -11,6 +11,9 @@
 #include "AdcH.h"
 #include "TimH.h"
 #include "PortH.h"
+#include "spi.h"
+#include "g26_board.h"
+#include "g26_bsw.h"
 #include "dma.h"
 #include "CrcH.h"
 #include "UartH.h"
@@ -18,7 +21,8 @@
 #include "SystemManager.h"
 #include "DiagCtrl.h"
 #include "Pdc.h"
-#include "Rte.h"
+#include "App_Dependencies.h"
+#include "g26_app_net.h"
 /*****************************************
 *		END OF INCLUDE PATHS		     *
 ******************************************/
@@ -176,6 +180,10 @@ VOID EcuM_ProcessWakeupEvent()
 StdReturnType EcuM_DriverInit()
 {
 	Port_Init();
+#if G26_MCP2515_REWIRED_BOARD
+	MX_SPI1_Init();
+
+#endif
 	MX_DMA_Init();
 	Tim_Init(TIMER_TWO);
 	Tim_Init(TIMER_THREE);
@@ -186,6 +194,7 @@ StdReturnType EcuM_DriverInit()
 	Uart_Init();
 	Watchdog_Init();
 	MX_NVIC_Init();
+	G26_BswInit();
 	EcuM_BswState = ECUM_CHECKFORWAKEUP_STATE;
 	return E_OK;
 }

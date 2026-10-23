@@ -1,0 +1,7 @@
+# Reproducible tools and tests
+
+Modernization/tools/bootstrap_build.py provisions ignored local official Arm GNU 13.3.Rel1, CubeF4 v1.27.1 files and isolated Zig 0.13.0. It does not install system tools. Modernization/tools/build_firmware.py builds the actual independent Cube project source selections with Cortex-M4 hard-float settings. --variant legacy preserves defaults; can assumes an explicitly selected 16 MHz MCP2515; updater enables the FBL entry for inspection only. --debug selects -O0. Every build checks startup-copied SRAM flash helpers; FBL additionally checks complete SRAM updater relocation/disassembly closure.
+
+Modernization/tests/run_tests.py compiles and executes four assertion-enabled native suites: resident update/transport/controller; APP communication/diagnostics/DEM/NvM; actual SRAM updater protocol; bounded UART commands. Actual linked APP/FBL binaries are consumed when present. check_source_integration.py checks project inclusion, local copies, exclusions, scheduler and bounds; test_ram_checker.py proves rejection of an injected Flash dependency. record_validation.py records artifact hashes, memory and freshly rerun gates after successful builds/tests.
+
+See [exact commands/results](../modernization/G26_IMPLEMENTATION_CLOSURE.md) and [validation manifest](../modernization/VALIDATION_RESULTS.json). build/ contains ignored maps, compiler command manifests, logs, disassembly and stack-usage files. Native mocks and static checks do not verify physical timing, flash, actuator behavior or recovery.

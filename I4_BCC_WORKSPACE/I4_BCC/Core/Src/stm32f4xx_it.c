@@ -17,7 +17,7 @@
 #include "TimH.h"
 #include "Pdc.h"
 
-#include "../../Rte/Rte.h"
+#include "App_Dependencies.h"
 /*****************************************
 *		END OF INCLUDE PATHS		     *
 ******************************************/
@@ -231,7 +231,7 @@ void TIM2_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM2_IRQn 0 */
 	/* When alarm is on turn on the LEDs at full duty cycle for the designated time. */
-	if(Rte_P_SecAlm_SecAlmPort_SecAlm_PinStateChange == STD_HIGH)
+	if(SecAlm_PinStateChange == STD_HIGH)
 	{
 		TIM2->CCR1 = TIM2->ARR;
 		TIM2->CCR2 = TIM2->ARR;
@@ -243,7 +243,7 @@ void TIM2_IRQHandler(void)
 	/* Upon timer interrupt generation
 	 * proceed to increase the PWM duty cycle
 	 * for the low beam light until 75%. */
-	if(Rte_P_ExtLights_ExtLightsPort_ExtLights_LowBeam_CurrentState == STD_HIGH)
+	if(ExtLights_LowBeam_CurrentState == STD_HIGH)
 	{
 		if(TIM2->CCR1 < 1999)
 		{
@@ -265,7 +265,7 @@ void TIM2_IRQHandler(void)
 	/* Upon timer interrupt generation
 	 * proceed to increase the PWM duty cycle
 	 * for the rear position light until 75%. */
-	if(Rte_P_ExtLights_ExtLightsPort_ExtLights_RearPositionLights_CurrentState == STD_HIGH)
+	if(ExtLights_RearPositionLights_CurrentState == STD_HIGH)
 	{
 		if(TIM2->CCR2 < 1999)
 		{
@@ -284,7 +284,7 @@ void TIM2_IRQHandler(void)
 	{
 		/* do nothing */
 	}
-	if(Rte_P_IntLights_IntLightsPort_IntLights_CurrentState == STD_HIGH)
+	if(IntLights_CurrentState == STD_HIGH)
 	{
 		if(TIM2->CCR3 < 1999)
 		{
@@ -299,7 +299,7 @@ void TIM2_IRQHandler(void)
 			/* do nothing */
 		}
 	}
-	else if(Rte_P_IntLights_IntLightsPort_IntLights_CurrentState == STD_LOW)
+	else if(IntLights_CurrentState == STD_LOW)
 	{
 		if(TIM2->CCR3 > 20)
 		{
@@ -335,11 +335,11 @@ void TIM3_IRQHandler(void)
 	 * door led's brightness up to 100% gradually.
 	 * Set it to 100% upon reaching maximum value.
 	 * If the central lock is set to low, set duty cycle to 0. */
-	if(Rte_P_CenLoc_CenLocPort_CenLoc_CurrentState == STD_HIGH)
+	if(CenLoc_CurrentState == STD_HIGH)
 	{
 		TIM3->CCR1 = TIM3->ARR;
 	}
-	else if(Rte_P_CenLoc_CenLocPort_CenLoc_CurrentState == STD_LOW)
+	else if(CenLoc_CurrentState == STD_LOW)
 	{
 		TIM3->CCR1 = 0;
 	}
@@ -352,11 +352,11 @@ void TIM3_IRQHandler(void)
 	 * door led's brightness up to 100% gradually.
 	 * Set it to 100% upon reaching maximum value.
 	 * If the brake lights are set to low, set duty cycle to 0. */
-	if(Rte_P_ExtLights_ExtLightsPort_ExtLights_BrakeLight_CurrentState == STD_HIGH)
+	if(ExtLights_BrakeLight_CurrentState == STD_HIGH)
 	{
 		TIM3->CCR2 = TIM3->ARR;
 	}
-	else if(Rte_P_ExtLights_ExtLightsPort_ExtLights_BrakeLight_CurrentState == STD_LOW)
+	else if(ExtLights_BrakeLight_CurrentState == STD_LOW)
 	{
 		TIM3->CCR2 = 0;
 	}
@@ -369,7 +369,7 @@ void TIM3_IRQHandler(void)
 	 * door led's brightness up to 100% gradually.
 	 * Set it to 100% upon reaching maximum value.
 	 * If the front fog lights are set to low, set duty cycle to 0. */
-	if(Rte_P_ExtLights_ExtLightsPort_ExtLights_FrontFogLight_CurrentState == STD_HIGH)
+	if(ExtLights_FrontFogLight_CurrentState == STD_HIGH)
 	{
 		if(TIM3->CCR3 < 1999)
 		{
@@ -384,7 +384,7 @@ void TIM3_IRQHandler(void)
 			/* do nothing */
 		}
 	}
-	else if(Rte_P_ExtLights_ExtLightsPort_ExtLights_FrontFogLight_CurrentState == STD_LOW)
+	else if(ExtLights_FrontFogLight_CurrentState == STD_LOW)
 	{
 		TIM3->CCR3 = 0;
 	}
@@ -397,7 +397,7 @@ void TIM3_IRQHandler(void)
 	 * door led's brightness up to 100% gradually.
 	 * Set it to 100% upon reaching maximum value.
 	 * If the rear fog lights are set to low, set duty cycle to 0. */
-	if(Rte_P_ExtLights_ExtLightsPort_ExtLights_RearFogLight_CurrentState == STD_HIGH)
+	if(ExtLights_RearFogLight_CurrentState == STD_HIGH)
 	{
 		if(TIM3->CCR4 < 1999)
 		{
@@ -412,7 +412,7 @@ void TIM3_IRQHandler(void)
 			/* do nothing */
 		}
 	}
-	else if(Rte_P_ExtLights_ExtLightsPort_ExtLights_RearFogLight_CurrentState == STD_LOW)
+	else if(ExtLights_RearFogLight_CurrentState == STD_LOW)
 	{
 		TIM3->CCR4 = 0;
 	}

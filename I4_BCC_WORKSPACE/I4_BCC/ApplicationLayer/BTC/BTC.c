@@ -8,8 +8,9 @@
 ******************************************/
 #include "Btc.h"
 #include "UartH.h"
+#include "G26_CommandRx.h"
 #include "SystemManager.h"
-#include "Rte.h"
+#include "App_Dependencies.h"
 /*****************************************
 *		END OF INCLUDE PATHS		     *
 ******************************************/
@@ -17,11 +18,8 @@
 *		VARIABLES					 	 *
 ******************************************/
 /* Data buffer for bluetooth communication through UART. */
-uint8 Btc_DataBuffer[BTC_BUFFER_SIZE] = {STD_LOW};
 /* UART data received from bluetooth module. */
-uint8 Btc_RxData = STD_LOW;
 /* Counter for data length. */
-uint8 Btc_RxCount = STD_LOW;
 /* Bluetooth command converted into uint8. */
 uint8 Btc_ReceivedDataOnBluetooth = STD_LOW;
 /* Auxiliary variable used for bluetooth command. */
@@ -115,10 +113,10 @@ VOID Btc_RequestState()
 		Btc_DtcDescriptionLength4 = strlen(Btc_DtcFrontParkingSensor);
 		Btc_DtcDescriptionLength5 = strlen(Btc_DtcHardware);
 		Btc_DtcDescriptionLength6 = strlen(Btc_DtcBtc);
-		if(Dem_DtcArray[4] != 0)
+		if(Dem_IsLegacyFaultActive(4) != 0)
 		{
 			while(HAL_UART_Transmit_IT(&huart1, (uint8*)Btc_DtcBtc, Btc_DtcDescriptionLength6) == HAL_BUSY);
-			Rte_Runnable_Wdg_MainFunction();
+			Watchdog_MainFunction();
 		}
 		else
 		{
@@ -126,54 +124,54 @@ VOID Btc_RequestState()
 		}
 
 
-		if(Dem_DtcArray[0] != 0)
+		if(Dem_IsLegacyFaultActive(0) != 0)
 		{
 			while(HAL_UART_Transmit_IT(&huart1, (uint8*)Btc_DtcLightSensor, Btc_DtcDescriptionLength1) == HAL_BUSY);
-			Rte_Runnable_Wdg_MainFunction();
+			Watchdog_MainFunction();
 		}
 		else
 		{
 			/* do nothing */
 		}
-		if(Dem_DtcArray[1] != 0)
+		if(Dem_IsLegacyFaultActive(1) != 0)
 		{
 			while(HAL_UART_Transmit_IT(&huart1, (uint8*)Btc_DtcVibrationSensor, Btc_DtcDescriptionLength2) == HAL_BUSY);
-			Rte_Runnable_Wdg_MainFunction();
+			Watchdog_MainFunction();
 		}
 		else
 		{
 			/* do nothing */
 		}
 
-		if(Dem_DtcArray[2] != 0)
+		if(Dem_IsLegacyFaultActive(2) != 0)
 		{
 			while(HAL_UART_Transmit_IT(&huart1, (uint8*)Btc_DtcRearParkingSensor, Btc_DtcDescriptionLength3) == HAL_BUSY);
-			Rte_Runnable_Wdg_MainFunction();
+			Watchdog_MainFunction();
 		}
 		else
 		{
 			/* do nothing */
 		}
-		if(Dem_DtcArray[3] != 0)
+		if(Dem_IsLegacyFaultActive(3) != 0)
 		{
 			while(HAL_UART_Transmit_IT(&huart1, (uint8*)Btc_DtcFrontParkingSensor, Btc_DtcDescriptionLength4) == HAL_BUSY);
-			Rte_Runnable_Wdg_MainFunction();
+			Watchdog_MainFunction();
 		}
 		else
 		{
 			/* do nothing */
 		}
 
-		if(Dem_DtcArray[5] != 0 || Dem_DtcArray[6] != 0 || Dem_DtcArray[7] != 0)
+		if(Dem_IsLegacyFaultActive(5) != 0 || Dem_IsLegacyFaultActive(6) != 0 || Dem_IsLegacyFaultActive(7) != 0)
 		{
 			while(HAL_UART_Transmit_IT(&huart1, (uint8*)Btc_DtcHardware, Btc_DtcDescriptionLength5) == HAL_BUSY);
-			Rte_Runnable_Wdg_MainFunction();
+			Watchdog_MainFunction();
 		}
 		else
 		{
 			/* do nothing */
 		}
-		Rte_Runnable_Wdg_MainFunction();
+		Watchdog_MainFunction();
 		Btc_ReceivedDataOnBluetooth = 0;
 	}
 	else
@@ -190,17 +188,17 @@ VOID Btc_RequestState()
 ************************************************************************************/
 VOID Btc_RxVal()
 {
-	if(Rte_Call_Crc_R_CrcPort_Crc_VerifyUartData() == E_OK)
+	if(Crc_VerifyUartData() == E_OK)
 	{
 
 		/* Process the command on each case and update the respective variable. */
 		switch(Btc_ReceivedDataOnBluetooth)
 		{
 			case BTC_RX_EXTLIGHTS_REVERSELIGHT_ON:
-				if(Rte_P_CenLoc_CenLocPort_CenLoc_CurrentState == STD_HIGH)
+				if(CenLoc_CurrentState == STD_HIGH)
 				{
 					Btc_ReverseLight = STD_HIGH;
-					Rte_Write_ExtLights_ExtLightsPort_ExtLights_ReverseLight_CurrentState(&Btc_ReverseLight);
+					ExtLights_ReverseLight_CurrentState = Btc_ReverseLight;
 				}
 				else
 				{
@@ -208,10 +206,10 @@ VOID Btc_RxVal()
 				}
 				break;
 			case BTC_RX_EXTLIGHTS_REVERSELIGHT_OFF:
-				if(Rte_P_CenLoc_CenLocPort_CenLoc_CurrentState == STD_HIGH)
+				if(CenLoc_CurrentState == STD_HIGH)
 				{
 					Btc_ReverseLight = STD_LOW;
-					Rte_Write_ExtLights_ExtLightsPort_ExtLights_ReverseLight_CurrentState(&Btc_ReverseLight);
+					ExtLights_ReverseLight_CurrentState = Btc_ReverseLight;
 				}
 				else
 				{
@@ -219,10 +217,10 @@ VOID Btc_RxVal()
 				}
 				break;
 			case BTC_RX_EXTLIGHTS_POSITIONZERO:
-				if(Rte_P_CenLoc_CenLocPort_CenLoc_CurrentState == STD_HIGH)
+				if(CenLoc_CurrentState == STD_HIGH)
 				{
 					Btc_LightSwitch = BTC_RX_EXTLIGHTS_POSITIONZERO;
-					Rte_Write_ExtLights_ExtLightsPort_ExtLights_LightsSwitch_CurrentState(&Btc_LightSwitch);
+					ExtLights_LightsSwitch_CurrentState = Btc_LightSwitch;
 				}
 				else
 				{
@@ -230,10 +228,10 @@ VOID Btc_RxVal()
 				}
 				break;
 			case BTC_RX_EXTLIGHTS_AUTOMATICLIGHTS:
-				if(Rte_P_CenLoc_CenLocPort_CenLoc_CurrentState == STD_HIGH)
+				if(CenLoc_CurrentState == STD_HIGH)
 				{
 					Btc_LightSwitch = BTC_RX_EXTLIGHTS_AUTOMATICLIGHTS;
-					Rte_Write_ExtLights_ExtLightsPort_ExtLights_LightsSwitch_CurrentState(&Btc_LightSwitch);
+					ExtLights_LightsSwitch_CurrentState = Btc_LightSwitch;
 				}
 				else
 				{
@@ -241,10 +239,10 @@ VOID Btc_RxVal()
 				}
 				break;
 			case BTC_RX_EXTLIGHTS_POSITIONLIGHTS:
-				if(Rte_P_CenLoc_CenLocPort_CenLoc_CurrentState == STD_HIGH)
+				if(CenLoc_CurrentState == STD_HIGH)
 				{
 					Btc_LightSwitch = BTC_RX_EXTLIGHTS_POSITIONLIGHTS;
-					Rte_Write_ExtLights_ExtLightsPort_ExtLights_LightsSwitch_CurrentState(&Btc_LightSwitch);
+					ExtLights_LightsSwitch_CurrentState = Btc_LightSwitch;
 				}
 				else
 				{
@@ -252,10 +250,10 @@ VOID Btc_RxVal()
 				}
 				break;
 			case BTC_RX_EXTLIGHTS_NIGHTTIMELIGHTS:
-				if(Rte_P_CenLoc_CenLocPort_CenLoc_CurrentState == STD_HIGH)
+				if(CenLoc_CurrentState == STD_HIGH)
 				{
 					Btc_LightSwitch = BTC_RX_EXTLIGHTS_NIGHTTIMELIGHTS;
-					Rte_Write_ExtLights_ExtLightsPort_ExtLights_LightsSwitch_CurrentState(&Btc_LightSwitch);
+					ExtLights_LightsSwitch_CurrentState = Btc_LightSwitch;
 				}
 				else
 				{
@@ -264,18 +262,18 @@ VOID Btc_RxVal()
 				break;
 			case BTC_RX_CENLOC_ON:
 				Btc_CenLoc = STD_HIGH;
-				Rte_Write_CenLoc_CenLocPort_CenLoc_CurrentState(&Btc_CenLoc);
+				CenLoc_CurrentState = Btc_CenLoc;
 				break;
 			case BTC_RX_CENLOC_OFF:
 				Btc_CenLoc = STD_LOW;
-				Rte_Write_CenLoc_CenLocPort_CenLoc_CurrentState(&Btc_CenLoc);
+				CenLoc_CurrentState = Btc_CenLoc;
 				break;
 			case BTC_RX_EXTLIGHTS_HIGHBEAM_ON:
-				if(Rte_P_CenLoc_CenLocPort_CenLoc_CurrentState == STD_HIGH)
+				if(CenLoc_CurrentState == STD_HIGH)
 				{
 					Btc_HighBeam = STD_HIGH;
 					Btc_FlashHighBeam = STD_LOW;
-					Rte_Write_ExtLights_ExtLightsPort_ExtLights_HighBeam_CurrentState(&Btc_HighBeam);
+					ExtLights_HighBeam_CurrentState = Btc_HighBeam;
 				}
 				else
 				{
@@ -283,10 +281,10 @@ VOID Btc_RxVal()
 				}
 				break;
 			case BTC_RX_EXTLIGHTS_HIGHBEAM_OFF:
-				if(Rte_P_CenLoc_CenLocPort_CenLoc_CurrentState == STD_HIGH)
+				if(CenLoc_CurrentState == STD_HIGH)
 				{
 					Btc_HighBeam = STD_LOW;
-					Rte_Write_ExtLights_ExtLightsPort_ExtLights_HighBeam_CurrentState(&Btc_HighBeam);
+					ExtLights_HighBeam_CurrentState = Btc_HighBeam;
 				}
 				else
 				{
@@ -294,12 +292,12 @@ VOID Btc_RxVal()
 				}
 				break;
 			case BTC_RX_EXTLIGHTS_TURNSIGNALLEFT_ON:
-				if(Rte_P_CenLoc_CenLocPort_CenLoc_CurrentState == STD_HIGH)
+				if(CenLoc_CurrentState == STD_HIGH)
 				{
 					Btc_TurnSignalLeft = STD_HIGH;
 					Btc_TurnSignalRight = STD_LOW;
-					Rte_Write_ExtLights_ExtLightsPort_ExtLights_TurnSignalLeft_CurrentState(&Btc_TurnSignalLeft);
-					Rte_Write_ExtLights_ExtLightsPort_ExtLights_TurnSignalRight_CurrentState(&Btc_TurnSignalRight);
+					ExtLights_TurnSignalLeft_CurrentState = Btc_TurnSignalLeft;
+					ExtLights_TurnSignalRight_CurrentState = Btc_TurnSignalRight;
 				}
 				else
 				{
@@ -307,10 +305,10 @@ VOID Btc_RxVal()
 				}
 				break;
 			case BTC_RX_EXTLIGHTS_TURNSIGNALLEFT_OFF:
-				if(Rte_P_CenLoc_CenLocPort_CenLoc_CurrentState == STD_HIGH)
+				if(CenLoc_CurrentState == STD_HIGH)
 				{
 					Btc_TurnSignalLeft = STD_LOW;
-					Rte_Write_ExtLights_ExtLightsPort_ExtLights_TurnSignalLeft_CurrentState(&Btc_TurnSignalLeft);
+					ExtLights_TurnSignalLeft_CurrentState = Btc_TurnSignalLeft;
 				}
 				else
 				{
@@ -318,12 +316,12 @@ VOID Btc_RxVal()
 				}
 				break;
 			case BTC_RX_EXTLIGHTS_TURNSIGNALRIGHT_ON:
-				if(Rte_P_CenLoc_CenLocPort_CenLoc_CurrentState == STD_HIGH)
+				if(CenLoc_CurrentState == STD_HIGH)
 				{
 					Btc_TurnSignalRight = STD_HIGH;
 					Btc_TurnSignalLeft = STD_LOW;
-					Rte_Write_ExtLights_ExtLightsPort_ExtLights_TurnSignalLeft_CurrentState(&Btc_TurnSignalLeft);
-					Rte_Write_ExtLights_ExtLightsPort_ExtLights_TurnSignalRight_CurrentState(&Btc_TurnSignalRight);
+					ExtLights_TurnSignalLeft_CurrentState = Btc_TurnSignalLeft;
+					ExtLights_TurnSignalRight_CurrentState = Btc_TurnSignalRight;
 				}
 				else
 				{
@@ -331,10 +329,10 @@ VOID Btc_RxVal()
 				}
 				break;
 			case BTC_RX_EXTLIGHTS_TURNSIGNALRIGHT_OFF:
-				if(Rte_P_CenLoc_CenLocPort_CenLoc_CurrentState == STD_HIGH)
+				if(CenLoc_CurrentState == STD_HIGH)
 				{
 					Btc_TurnSignalRight = STD_LOW;
-					Rte_Write_ExtLights_ExtLightsPort_ExtLights_TurnSignalRight_CurrentState(&Btc_TurnSignalRight);
+					ExtLights_TurnSignalRight_CurrentState = Btc_TurnSignalRight;
 				}
 				else
 				{
@@ -342,10 +340,10 @@ VOID Btc_RxVal()
 				}
 				break;
 			case BTC_RX_EXTLIGHTS_HAZARDLIGHT_ON:
-				if(Rte_P_CenLoc_CenLocPort_CenLoc_CurrentState == STD_HIGH)
+				if(CenLoc_CurrentState == STD_HIGH)
 				{
 					Btc_HazardLight = STD_HIGH;
-					Rte_Write_ExtLights_ExtLightsPort_ExtLights_HazardLight_CurrentState(&Btc_HazardLight);
+					ExtLights_HazardLight_CurrentState = Btc_HazardLight;
 				}
 				else
 				{
@@ -353,10 +351,10 @@ VOID Btc_RxVal()
 				}
 				break;
 			case BTC_RX_EXTLIGHTS_HAZARDLIGHT_OFF:
-				if(Rte_P_CenLoc_CenLocPort_CenLoc_CurrentState == STD_HIGH)
+				if(CenLoc_CurrentState == STD_HIGH)
 				{
 					Btc_HazardLight = STD_LOW;
-					Rte_Write_ExtLights_ExtLightsPort_ExtLights_HazardLight_CurrentState(&Btc_HazardLight);
+					ExtLights_HazardLight_CurrentState = Btc_HazardLight;
 				}
 				else
 				{
@@ -364,10 +362,10 @@ VOID Btc_RxVal()
 				}
 				break;
 			case BTC_RX_EXTLIGHTS_FOGLIGHTFRONT_ON:
-				if(Rte_P_CenLoc_CenLocPort_CenLoc_CurrentState == STD_HIGH)
+				if(CenLoc_CurrentState == STD_HIGH)
 				{
 					Btc_FrontFogLight = STD_HIGH;
-					Rte_Write_ExtLights_ExtLightsPort_ExtLights_FrontFogLight_CurrentState(&Btc_FrontFogLight);
+					ExtLights_FrontFogLight_CurrentState = Btc_FrontFogLight;
 				}
 				else
 				{
@@ -375,10 +373,10 @@ VOID Btc_RxVal()
 				}
 				break;
 			case BTC_RX_EXTLIGHTS_FOGLIGHTFRONT_OFF:
-				if(Rte_P_CenLoc_CenLocPort_CenLoc_CurrentState == STD_HIGH)
+				if(CenLoc_CurrentState == STD_HIGH)
 				{
 					Btc_FrontFogLight = STD_LOW;
-					Rte_Write_ExtLights_ExtLightsPort_ExtLights_FrontFogLight_CurrentState(&Btc_FrontFogLight);
+					ExtLights_FrontFogLight_CurrentState = Btc_FrontFogLight;
 				}
 				else
 				{
@@ -386,10 +384,10 @@ VOID Btc_RxVal()
 				}
 				break;
 			case BTC_RX_EXTLIGHTS_FOGLIGHTREAR_ON:
-				if(Rte_P_CenLoc_CenLocPort_CenLoc_CurrentState == STD_HIGH)
+				if(CenLoc_CurrentState == STD_HIGH)
 				{
 					Btc_RearFogLight = STD_HIGH;
-					Rte_Write_ExtLights_ExtLightsPort_ExtLights_RearFogLight_CurrentState(&Btc_RearFogLight);
+					ExtLights_RearFogLight_CurrentState = Btc_RearFogLight;
 				}
 				else
 				{
@@ -397,10 +395,10 @@ VOID Btc_RxVal()
 				}
 				break;
 			case BTC_RX_EXTLIGHTS_FOGLIGHTREAR_OFF:
-				if(Rte_P_CenLoc_CenLocPort_CenLoc_CurrentState == STD_HIGH)
+				if(CenLoc_CurrentState == STD_HIGH)
 				{
 					Btc_RearFogLight = STD_LOW;
-					Rte_Write_ExtLights_ExtLightsPort_ExtLights_RearFogLight_CurrentState(&Btc_RearFogLight);
+					ExtLights_RearFogLight_CurrentState = Btc_RearFogLight;
 				}
 				else
 				{
@@ -408,10 +406,10 @@ VOID Btc_RxVal()
 				}
 				break;
 			case BTC_RX_EXTLIGHTS_BRAKELIGHTON:
-				if(Rte_P_CenLoc_CenLocPort_CenLoc_CurrentState == STD_HIGH)
+				if(CenLoc_CurrentState == STD_HIGH)
 				{
 					Btc_BrakeLight = STD_HIGH;
-					Rte_Write_ExtLights_ExtLightsPort_ExtLights_BrakeLight_CurrentState(&Btc_BrakeLight);
+					ExtLights_BrakeLight_CurrentState = Btc_BrakeLight;
 				}
 				else
 				{
@@ -419,10 +417,10 @@ VOID Btc_RxVal()
 				}
 				break;
 			case BTC_RX_EXTLIGHTS_BRAKELIGHTOFF:
-				if(Rte_P_CenLoc_CenLocPort_CenLoc_CurrentState == STD_HIGH)
+				if(CenLoc_CurrentState == STD_HIGH)
 				{
 					Btc_BrakeLight = STD_LOW;
-					Rte_Write_ExtLights_ExtLightsPort_ExtLights_BrakeLight_CurrentState(&Btc_BrakeLight);
+					ExtLights_BrakeLight_CurrentState = Btc_BrakeLight;
 				}
 				else
 				{
@@ -430,10 +428,10 @@ VOID Btc_RxVal()
 				}
 				break;
 			case BTC_RX_INTLIGHTS_INTERIORLIGHT_ON:
-				if(Rte_P_CenLoc_CenLocPort_CenLoc_CurrentState == STD_HIGH)
+				if(CenLoc_CurrentState == STD_HIGH)
 				{
 					Btc_IntLights = STD_HIGH;
-					Rte_Write_IntLights_IntLightsPort_IntLights_CurrentState(&Btc_IntLights);
+					IntLights_CurrentState = Btc_IntLights;
 				}
 				else
 				{
@@ -441,10 +439,10 @@ VOID Btc_RxVal()
 				}
 				break;
 			case BTC_RX_INTLIGHTS_INTERIORLIGHT_OFF:
-				if(Rte_P_CenLoc_CenLocPort_CenLoc_CurrentState == STD_HIGH)
+				if(CenLoc_CurrentState == STD_HIGH)
 				{
 					Btc_IntLights = STD_LOW;
-					Rte_Write_IntLights_IntLightsPort_IntLights_CurrentState(&Btc_IntLights);
+					IntLights_CurrentState = Btc_IntLights;
 				}
 				else
 				{
@@ -469,6 +467,9 @@ VOID Btc_RxVal()
 ************************************************************************************/
 VOID Btc_MainFunction()
 {
+    uint8 command=0;
+    (void)G26_CommandRxPop(&command);
+    Btc_ReceivedDataOnBluetooth=command;
 	Btc_RxVal();
 	Btc_RequestState();
 }

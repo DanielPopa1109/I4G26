@@ -60,7 +60,6 @@
 "./Middlewares/FreeRTOS/stream_buffer.o"
 "./Middlewares/FreeRTOS/tasks.o"
 "./Middlewares/FreeRTOS/timers.o"
-"./Rte/Rte.o"
 "./SystemServices/Crc/CrcH.o"
 "./SystemServices/EcuM/EcuM.o"
 "./SystemServices/SystemManager/SystemManager.o"

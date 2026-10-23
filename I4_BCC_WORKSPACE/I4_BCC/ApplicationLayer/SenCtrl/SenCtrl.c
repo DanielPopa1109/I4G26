@@ -9,7 +9,7 @@
 #include "SenCtrl.h"
 #include "PortH.h"
 
-#include "../../Rte/Rte.h"
+#include "App_Dependencies.h"
 /*****************************************
 *		END OF INCLUDE PATHS		     *
 ******************************************/
@@ -54,12 +54,12 @@ VOID SenCtrl_ProcessSensorValue(uint8 request)
 			if(SenCtrl_MeasuredValues[SENCTRL_EXTLIGHTS_LS_POSITION] >= 4000)
 			{
 				uint32 localls = 1;
-				Rte_Write_ExtLights_ExtLightsPort_ExtLights_LightSensorState(&localls);
+				ExtLights_LightSensorState = localls;
 			}
 			else if(SenCtrl_MeasuredValues[SENCTRL_EXTLIGHTS_LS_POSITION] < 4000)
 			{
 				uint32 localls = 0;
-				Rte_Write_ExtLights_ExtLightsPort_ExtLights_LightSensorState(&localls);
+				ExtLights_LightSensorState = localls;
 			}
 			else
 			{
@@ -70,12 +70,12 @@ VOID SenCtrl_ProcessSensorValue(uint8 request)
 			if(SenCtrl_MeasuredValues[SENCTRL_SECALM_VS_REQUEST] == 4095)
 			{
 				uint32 localvs = STD_HIGH;
-				Rte_Write_SecAlm_SecAlmPort_SecAlm_SensorState(&localvs);
+				SecAlm_SensorState = localvs;
 			}
 			else if(SenCtrl_MeasuredValues[SENCTRL_SECALM_VS_REQUEST] < 4095)
 			{
 				uint32 localvs = STD_LOW;
-				Rte_Write_SecAlm_SecAlmPort_SecAlm_SensorState(&localvs);
+				SecAlm_SensorState = localvs;
 			}
 			else
 			{
