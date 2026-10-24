@@ -142,6 +142,11 @@ static void test_full_programming(const char *filename)
  uint8_t *image=malloc(G26_FLASH_END-G26_APP_VECTOR);assert(image);
  size_t n=fread(image,1,G26_FLASH_END-G26_APP_VECTOR,file);assert(n>512 && fgetc(file)==EOF);fclose(file);
  G26_Flash flash={0,erase_app,write_flash,read_flash};G26_Uds uds;G26_UdsInit(&uds,flash);
+  {
+   uint8_t did[]={0x22,0xF1,0x87},identity[16];
+   assert(G26_UdsHandle(&uds,did,sizeof did,0,identity,sizeof identity)==8);
+   assert(memcmp(identity,"\x62\xF1\x87G26F2",8)==0);
+  }
  uint8_t r[256]={0x10,2},out[16];assert(G26_UdsHandle(&uds,r,2,0,out,16)==6);
  r[0]=0x31;r[1]=1;r[2]=0;r[3]=1;
  uint32_t address=G26_APP_VECTOR;

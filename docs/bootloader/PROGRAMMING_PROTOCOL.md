@@ -1,12 +1,12 @@
 # G26 programming protocol
 
-This describes implemented local lab services. ZGW/FCD target configuration and a hardware session are still required.
+This describes implemented local lab services. ZGW and FCD now contain a G26 route and target profile; a firmware build and physical CAN/flash session are still required to validate them together.
 
 All modes use Classic CAN request 0x710, target EA 0x55, response 0x709 with tester EA 0xF0. Response flow control from ZGW uses EA 0x41. APP and resident transport capacity is 256 bytes. MCP2515 transmission is physically confirmed before destructive handover/reset decisions.
 
 ## APP
 
-Default/extended sessions: 10 01 / 10 03. APP programming entry 10 02 requires extended session, completes NvM persistence, sends the positive response and resets with a validated boot mailbox only after successful TX. TesterPresent 3E, DIDs F1A0=G26-BODY, F187=G26A2 and F186=current session are configured.
+Default/extended sessions: 10 01 / 10 03. APP programming entry 10 02 requires extended session, completes NvM persistence, sends the positive response and resets with a validated boot mailbox only after successful TX. TesterPresent 3E, DIDs F1A0=G26-BODY, F187=G26A2 and F186=current session are configured. The resident FBL answers DID F187 with G26F2 so FCD can verify the handover before erase.
 
 Services 19 01/02/04/06/0A, persistent 14, CommunicationControl 28, ControlDTCSetting 85 and ECUReset 11 are configured. Snapshot record 1 is six bytes under G26-local DID F1D0: event number, captured status, occurrence and three-byte allocation sequence. Extended record 1 contains occurrence, confirmation and aging. RID F001 persists diagnostic memory using INITIAL/PENDING/CANCEL-style app processing. These lab identities/records are not OEM assignments. Security/coding services are unconfigured.
 
