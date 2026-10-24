@@ -13,5 +13,6 @@ int MemIf_InvalidateBlock(uint8_t device,uint16_t block);
 uint8_t MemIf_GetJobResult(uint8_t device);
 uint8_t MemIf_GetStatus(uint8_t device);
 void MemIf_MainFunction(void);
+/* Erase preparation: 0=wait, 1=proceed, 2=fail the queued job. */
 void MemIf_SetErasePreparationCallback(uint8_t (*callback)(void));
 #endif

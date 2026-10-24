@@ -13,10 +13,10 @@ Services 19 01/02/04/06/0A, persistent 14, CommunicationControl 28, ControlDTCSe
 ## Resident APP programming
 
 1. Enter programming session 10 02.
-2. Erase: 31 01 00 01 + 4-byte big-endian APP vector address + 4-byte image length.
+2. Erase: 31 01 00 01 + 4-byte big-endian APP vector address + 4-byte image length. The resident FBL must physically confirm NRC78 before dispatching this erase; a failed confirmation leaves the APP untouched.
 3. RequestDownload: 34 00 44 + address + length. It must match the prepared erase.
 4. TransferData: 36 BSC + 1..240 bytes, starting BSC=1, modulo 256. Identical duplicates are accepted.
-5. TransferExit: 37 + big-endian IEEE CRC32. Length, readback and vectors must validate; metadata/magic are committed only after integrity checks.
+5. TransferExit: 37 + big-endian IEEE CRC32. The FBL must physically confirm NRC78 before CRC validation and header commit. Length, readback and vectors must validate; metadata/magic are committed only after integrity checks.
 6. ECUReset: 11 01, after physical positive-response transmission.
 
 APP programming erases sectors 5–6 only. Invalid/interrupted images do not pass boot validation.

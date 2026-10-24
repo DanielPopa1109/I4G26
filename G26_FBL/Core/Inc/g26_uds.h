@@ -14,6 +14,8 @@ typedef struct {
     uint8_t erase_prepared;
     uint8_t reset_requested;
     uint8_t updater_requested, download_active;
+    /* One request only. Set after NRC 0x78 has been physically confirmed. */
+    uint8_t confirmed_pending_sid;
 } G26_Uds;
 
 void G26_UdsInit(G26_Uds *uds, G26_Flash flash);
@@ -22,5 +24,8 @@ void G26_UdsInit(G26_Uds *uds, G26_Flash flash);
 size_t G26_UdsHandle(G26_Uds *uds, const uint8_t *request, size_t length,
                      uint32_t now_ms, uint8_t *response, size_t capacity);
 void G26_UdsTick(G26_Uds *uds, uint32_t now_ms);
+int G26_UdsNeedsConfirmedPending(const uint8_t *request, size_t length,
+                                 uint8_t session);
+void G26_UdsConfirmPending(G26_Uds *uds, uint8_t sid);
 
 #endif

@@ -39,13 +39,30 @@ void G26_UdsTick(G26_Uds *uds, uint32_t now_ms)
     }
 }
 
+int G26_UdsNeedsConfirmedPending(const uint8_t *req, size_t len,
+                                 uint8_t session)
+{
+    return req && session == 2u &&
+           ((len == 12u && req[0] == 0x31u && req[1] == 1u &&
+             req[2] == 0u && req[3] == 1u) ||
+            (len == 5u && req[0] == 0x37u));
+}
+
+void G26_UdsConfirmPending(G26_Uds *uds, uint8_t sid)
+{
+    if (uds && (sid == 0x31u || sid == 0x37u))
+        uds->confirmed_pending_sid = sid;
+}
+
 size_t G26_UdsHandle(G26_Uds *uds, const uint8_t *req, size_t len,
                      uint32_t now_ms, uint8_t *out, size_t cap)
 {
-    uint8_t sid, sub, result;
+    uint8_t sid, sub, result, confirmed_pending_sid;
     uint32_t address, size;
     if (!uds || !req || !len || !out || cap < 16) return 0;
     sid = req[0];
+    confirmed_pending_sid = uds->confirmed_pending_sid;
+    uds->confirmed_pending_sid = 0u;
     G26_UdsTick(uds, now_ms);
     if (uds->session != 1) uds->session_deadline = now_ms + 5000u;
     if (sid == 0x10) {
@@ -69,6 +86,15 @@ size_t G26_UdsHandle(G26_Uds *uds, const uint8_t *req, size_t len,
         out[0] = 0x7E; out[1] = 0;
         return 2;
     }
+    if (sid == 0x22) {
+        if (len != 3u) return negative(sid, NRC_LENGTH, out);
+        if (req[1] != 0xF1u || req[2] != 0x87u)
+            return negative(sid, NRC_RANGE, out);
+        /* FCD uses this identity to prove that the reset reached resident FBL. */
+        out[0] = 0x62u; out[1] = 0xF1u; out[2] = 0x87u;
+        memcpy(out + 3, "G26F2", 5u);
+        return 8u;
+    }
     if (sid == 0x11) {
         if (len != 2 || req[1] != 1) return negative(sid, NRC_LENGTH, out);
         uds->reset_requested = 1;
@@ -91,6 +117,8 @@ size_t G26_UdsHandle(G26_Uds *uds, const uint8_t *req, size_t len,
         address = be32(req + 4); size = be32(req + 8);
         if (address != G26_APP_VECTOR || size < 8 || size > G26_FLASH_END - G26_APP_VECTOR)
             return negative(sid, NRC_RANGE, out);
+        if (confirmed_pending_sid != sid)
+            return negative(sid, NRC_CONDITIONS, out);
         result = (uint8_t)G26_UpdateBegin(&uds->update, size, 0);
         if (result != G26_UPDATE_OK) return negative(sid, NRC_PROGRAMMING, out);
         uds->download_address = address;
@@ -133,6 +161,8 @@ size_t G26_UdsHandle(G26_Uds *uds, const uint8_t *req, size_t len,
         if (uds->session != 2) return negative(sid, NRC_SESSION, out);
         if(!uds->download_active)return negative(sid,NRC_SEQUENCE,out);
         if (len != 5) return negative(sid, NRC_LENGTH, out);
+        if (confirmed_pending_sid != sid)
+            return negative(sid, NRC_CONDITIONS, out);
         uds->update.expected_crc = be32(req + 1);
         result = (uint8_t)G26_UpdateFinish(&uds->update);
         if (result == G26_UPDATE_SEQUENCE) return negative(sid, NRC_SEQUENCE, out);

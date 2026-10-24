@@ -16,6 +16,7 @@
 #include "Dem.h"
 #include "NvM.h"
 #include "MemIf.h"
+#include "Fee.h"
 #include "Fls.h"
 #include "g26_layout.h"
 static uint8_t flash[0x80000],sent[8];
@@ -76,6 +77,10 @@ static void test_network(void){
  puts("PASS communication: filtering, physical confirmations, bus-off, SF/FF/CF/FC, BS/STmin, sequence/timeouts, COM deadlines, NM3 and diagnostic gating");
 }
 static void test_memory(void){
+  assert(NVM_BLOCK_COUNT==FEE_BLOCK_COUNT);
+  assert(NvM_BlockDescriptor[0].length==Fee_BlockDescriptor[0].length);
+  assert(NvM_BlockDescriptor[0].version==Fee_BlockDescriptor[0].version);
+  assert(Fee_GetStatus(0)==0 && Fee_GetJobResult(0)==FEE_JOB_FAILED);
  memset(flash,255,sizeof(flash));storage();NvM_RequestResultType result;
  assert(!NvM_GetErrorStatus(1,&result) && result==NVM_REQ_RESTORED_FROM_ROM);
  Dem_ReceiveFault(DTC_LIGHT_SENSOR_MALFUNCTION);assert(Dem_IsLegacyFaultActive(0));NvM_WriteAll();drain();
@@ -162,4 +167,20 @@ static void test_long_erase(void){
  autoConfirm=1;ticks(100);assert(sent[2]==0x71);
  puts("PASS long erase: active diagnostic journal rotation waits for physical NRC78 confirmation");
 }
-int main(void){test_memory();test_dem();test_network();test_diagnostics();test_long_erase();return 0;}
+static void test_failed_pending_blocks_erase(void){
+ network();storage();
+ for(unsigned bank=0;bank<2;++bank){uint32_t base=(bank?FLS_BANK1:FLS_BANK0)-0x08000000,size=bank?FLS_SIZE1:FLS_SIZE0;
+  for(uint32_t at=0;at<size;at+=MEMIF_IMAGE_SIZE){unsigned empty=1;
+   for(unsigned i=0;i<MEMIF_IMAGE_SIZE;++i)if(flash[base+at+i]!=255){empty=0;break;}
+   if(empty)memset(flash+base+at,0xA5,MEMIF_IMAGE_SIZE);
+  }
+ }
+ uint8_t r[4]={0x10,3};request(r,2);ticks(2);
+ Dem_ReceiveFault(DTC_BLUETOOTH_MODULE_MALFUNCTION);
+ unsigned before=eraseCount;r[0]=0x31;r[1]=1;r[2]=0xF0;r[3]=1;request(r,4);
+ autoConfirm=0;tick();assert(sent[2]==0x7F && sent[4]==0x78 && eraseCount==before);
+ Can_TxConfirmation(0);autoConfirm=1;ticks(100);
+ assert(eraseCount==before && NvM_IsIdle() && NvM_LastWriteResult==1);
+ puts("PASS long erase: failed NRC78 confirmation aborts Fee/NvM without erasing");
+}
+int main(void){test_memory();test_dem();test_network();test_diagnostics();test_long_erase();test_failed_pending_blocks_erase();return 0;}

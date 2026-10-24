@@ -30,7 +30,7 @@ Dcm has request ownership, dispatch/access tables, session/S3 handling, P2/P2*, 
 
 Dem has eight G26 events, debouncing, UDS status, confirmation, one boot operation cycle, aging, event memory, snapshots, extended data, filtering and persistent clear rollback. Monitors remain in DiagCtrl and SystemManager. The old externally writable DTC arrays are removed.
 
-NvM has one genuine persistent block: the versioned 512-byte DEM image. No application coding/calibration schema exists in G26 to preserve, so reference ECU coding blocks were not invented. NvM queues jobs, snapshots writes, reports status, restores defaults and retries failures. MemIf stores CRC-protected 1 KiB append records with commit-last sequencing, generation selection and inactive-bank rotation. Unchanged blocks/records avoid writes.
+NvM has one genuine persistent block: the versioned 512-byte DEM image. No application coding/calibration schema exists in G26 to preserve, so reference ECU coding blocks were not invented. NvM queues jobs, snapshots writes, reports status, restores defaults and retries failures. MemIf routes the one configured device to Fee. Fee owns the CRC-protected 1 KiB append journal, commit-last sequencing, generation selection and inactive-bank rotation. Unchanged blocks/records avoid writes. Fee rejects jobs before initialization. A failed diagnostic NRC78 confirmation aborts the queued Fee erase, including NvM retries.
 
 The STM32 backend restricts erase/program to sectors 4 and 7. Busy polling/program/erase execute in .RamFunc SRAM code and feed IWDG. Cache invalidation precedes readback. An application callback coordinates diagnostic NRC78 delivery before a long erase. Single-bank flash erase still suspends normal code and IRQ processing; timing and input-loss behavior require bench validation.
 
@@ -41,3 +41,5 @@ The independent `G26_FBL` owns startup, SPI/CAN, transport, UDS, APP validation/
 The updater is part of the FBL load image but executes from SRAM, with its own vectors, stack, full replacement buffer, clock setup, SPI/MCP2515, transport, flash controller and reset path. It validates the complete replacement before erasing resident sectors 0-3 and programs reset vectors last. Activation remains explicitly interlocked off by default.
 
 See [compliance](COMPLIANCE_MATRIX.md), [partition](../bootloader/FINAL_MEMORY_LAYOUT.md), [updater evidence](../bootloader/RAM_UPDATER_VERIFICATION.md) and [closure](../modernization/G26_IMPLEMENTATION_CLOSURE.md).
+
+EcuM samples RCC reset flags once at startup and passes a valid power-on reset source (value zero) to SystemManager. FreeRTOS tickless idle uses WFI. No board-validated deep-sleep entry, wake-source validation or full EcuM shutdown/sleep sequence is implemented.

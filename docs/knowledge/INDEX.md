@@ -12,3 +12,5 @@ Source baseline: `I4_BCC_WORKSPACE/I4_BCC` (STM32CubeIDE project, STM32F411RETx)
 Primary evidence: `I4_BCC.ioc`, `Core/Src`, `BSW`, `DiagnosticServices/Dem`, `ApplicationLayer`, `Appl_Main/Appl_Main.c`, independent `G26_FBL`, `.cproject`, linker scripts and `BCC_PinConfig.csv`. RTE sources are removed. Read task-relevant source; do not infer board wiring from Nucleo settings alone.
 
 Current authority: [2026-10-19 implementation closure](../modernization/G26_IMPLEMENTATION_CLOSURE.md), [BSW architecture](../autosar/BSW_ARCHITECTURE.md), [scope matrix](../autosar/COMPLIANCE_MATRIX.md) and [validation manifest](../modernization/VALIDATION_RESULTS.json). Source implementation, build/host evidence and physical integration are separate statuses.
+
+Follow-up: [2026-10-24 APP/FBL behavior audit](../modernization/G26_APP_FBL_BEHAVIOR_AUDIT.md) records the current module-level assessment and subsequent fixes.

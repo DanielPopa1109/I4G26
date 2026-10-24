@@ -11,9 +11,11 @@
 #include <stdlib.h>
 
 static uint8_t flash_memory[G26_FLASH_END - G26_FLASH_BASE];
+static unsigned erase_calls;
 static int erase_app(void *ignored)
 {
     (void)ignored;
+    ++erase_calls;
     memset(flash_memory + G26_APP_BASE - G26_FLASH_BASE, 0xFF,
            G26_FLASH_END - G26_APP_BASE);
     return 0;
@@ -120,8 +122,13 @@ static void test_uds(void)
     {
         const uint8_t erase[] = {0x31,0x01,0x00,0x01,0x08,0x02,0x02,0x00,
                                  0,0,0,16};
+        unsigned before = erase_calls;
+        assert(G26_UdsNeedsConfirmedPending(erase, sizeof erase, uds.session));
+        assert(G26_UdsHandle(&uds, erase, sizeof erase, 3, out, sizeof out) == 3);
+        assert(out[0] == 0x7F && out[2] == 0x22 && erase_calls == before);
+        G26_UdsConfirmPending(&uds, 0x31);
         assert(G26_UdsHandle(&uds, erase, sizeof erase, 3, out, sizeof out) == 4);
-        assert(out[0] == 0x71);
+        assert(out[0] == 0x71 && erase_calls == before + 1);
     }
     assert(G26_UdsHandle(&uds, req, 11, 4, out, sizeof out) == 4);
     assert(out[0] == 0x74 && out[3] == 242);
@@ -139,6 +146,7 @@ static void test_full_programming(const char *filename)
  r[0]=0x31;r[1]=1;r[2]=0;r[3]=1;
  uint32_t address=G26_APP_VECTOR;
  for(unsigned i=0;i<4;++i){r[4+i]=(uint8_t)(address>>(24-8*i));r[8+i]=(uint8_t)(n>>(24-8*i));}
+ G26_UdsConfirmPending(&uds,0x31);
  assert(G26_UdsHandle(&uds,r,12,1,out,16)==4 && out[0]==0x71);
  r[0]=0x36;r[1]=1;r[2]=image[0];G26_UdsHandle(&uds,r,3,2,out,16);assert(out[0]==0x7F && out[2]==0x24);
  r[0]=0x34;r[1]=0;r[2]=0x44;
@@ -153,6 +161,10 @@ static void test_full_programming(const char *filename)
  }
  uint32_t crc=G26_Crc32(~0U,image,n)^~0U;r[0]=0x37;
  for(unsigned i=0;i<4;++i)r[1+i]=(uint8_t)(crc>>(24-8*i));
+ assert(G26_UdsNeedsConfirmedPending(r,5,uds.session));
+ assert(G26_UdsHandle(&uds,r,5,now,out,16)==3 && out[2]==0x22);
+ assert(!G26_ImageValid(&flash));
+ G26_UdsConfirmPending(&uds,0x37);
  assert(G26_UdsHandle(&uds,r,5,now,out,16)==1 && out[0]==0x77 && G26_ImageValid(&flash));
  free(image);puts("PASS resident FBL: actual linked APP binary UDS erase/download/transfer/duplicate blocks/CRC/commit/validation");
 }

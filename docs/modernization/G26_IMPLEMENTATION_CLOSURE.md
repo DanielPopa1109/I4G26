@@ -1,5 +1,7 @@
 # G26 implementation closure — 2026-10-19
 
+The [2026-10-24 follow-up audit](G26_APP_FBL_BEHAVIOR_AUDIT.md) supersedes this page for the current module assessment and records subsequent Fee, FBL and EcuM corrections. The build numbers below are the 2026-10-19 evidence, not measurements of later source.
+
 The configured G26 lab architecture is source implemented, Cortex-M build verified and host tested. Integration readiness and hardware verification remain open. This is an AUTOSAR Classic-style implementation with the explicit limits in the [compliance matrix](../autosar/COMPLIANCE_MATRIX.md), not a formal AUTOSAR conformance claim.
 
 ## Delivered implementation

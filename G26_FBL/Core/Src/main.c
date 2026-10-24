@@ -13,7 +13,7 @@
 __attribute__((section(".resident_tag"),used))
 const uint32_t resident_tag[8]={RAM_IMAGE_MAGIC,1,RAM_TARGET,RAM_MCU_ID,FBL_RESIDENT_SIZE,FBL_APP_START,FBL_METADATA,RAM_RESIDENT_VECTOR_WORDS};
 
-/* The FBL is linked in sectors 0-4. Its flash adapter erases only sectors 5-7. */
+/* The FBL is linked in sectors 0-3. Its flash adapter erases only sectors 5-6. */
 static G26_Mcp2515 can_controller;
 static G26_Tp transport;
 static G26_Uds diagnostics;
@@ -116,19 +116,20 @@ int main(void)
                 if (complete && response_length == 0u) {
                     /* Retain the FBL after a diagnostic request. */
                     boot_deadline = now + 3000u;
-                    if ((transport.rx_length==5u && transport.rx[0]==0x37u && diagnostics.session==2u) ||
-                       (transport.rx_length == 12u && transport.rx[0] == 0x31u &&
-                        transport.rx[1] == 0x01u && transport.rx[2] == 0x00u &&
-                        transport.rx[3] == 0x01u && diagnostics.session == 2u)) {
+                    int dispatch_allowed = 1;
+                    if (G26_UdsNeedsConfirmedPending(transport.rx,
+                            transport.rx_length, diagnostics.session)) {
                         uint8_t pending[] = {0x7Fu, transport.rx[0], 0x78u};
-                        if (G26_TpStart(&transport, pending, sizeof pending,
-                                        HAL_GetTick(), &outgoing)) {
-                            if (send_frame(&outgoing)) can_ready = 0;
-                        }
+                        if (!G26_TpStart(&transport, pending, sizeof pending,
+                                         HAL_GetTick(), &outgoing) ||
+                            send_frame(&outgoing)) {
+                            can_ready = 0;
+                            dispatch_allowed = 0;
+                        } else G26_UdsConfirmPending(&diagnostics, transport.rx[0]);
                     }
-                    length = G26_UdsHandle(&diagnostics, transport.rx,
-                                           transport.rx_length, now,
-                                           response, sizeof response);
+                    length = dispatch_allowed ? G26_UdsHandle(&diagnostics,
+                            transport.rx, transport.rx_length, now,
+                            response, sizeof response) : 0u;
                     /* Flash erase is blocking. Refresh S3 using actual elapsed
                      * time so a successful erase cannot expire the session. */
                     if (diagnostics.session != 1u)

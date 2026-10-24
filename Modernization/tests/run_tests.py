@@ -33,7 +33,7 @@ build('core',[FBL/'Src'/n for n in ['g26_update.c','g26_tp.c','g26_uds.c','g26_m
 includes=[APP/'Core/Inc',APP/'ProjectIncludes',APP/'DiagnosticServices/Dem']
 includes+=[p for p in (APP/'BSW').rglob('*') if p.is_dir()]
 sources=list((APP/'BSW/Com').rglob('*.c'))+list((APP/'BSW/Diag').rglob('*.c'))
-sources+=list((APP/'BSW/Mem').glob('*.c'))+list((APP/'BSW/Mem/MemIf').glob('*.c'))+list((APP/'BSW/Mem/Crc').glob('*.c'))
+sources+=list((APP/'BSW/Mem').glob('*.c'))+list((APP/'BSW/Mem/MemIf').glob('*.c'))+list((APP/'BSW/Mem/Fee').glob('*.c'))+list((APP/'BSW/Mem/Crc').glob('*.c'))
 sources+=list((APP/'DiagnosticServices/Dem').glob('*.c'))+[HERE/'test_bsw.c']
 build('bsw',sources,includes,['G26_HOST_TEST','G26_ENABLE_PROPOSED_STATUS=1'])
 build('ram_updater',[FBL/'Src/ram_blob.c',FBL/'Src/Fbl_Updater.c',HERE/'test_ram_updater.c'],[FBL/'Inc'],['RAM_HOST_TEST'])

@@ -33,6 +33,8 @@
 #define ECUM_DEINIT_STATE 			0x03
 #define ECUM_CHECKFORWAKEUP_STATE 	0x01
 #define ECUM_PROCESSWAKEUP_STATE 	0x02
+#define ECUM_RUN_STATE            0x04
+#define ECUM_NO_WAKEUP_SOURCE     0xFFU
 /*****************************************
 * 		END OF DEFINES					 *
 ******************************************/
@@ -42,7 +44,7 @@
 /* Variable to store Electronic Control Unit Manager state. */
 uint8 EcuM_BswState;
 /* Variable to store wake up source. */
-uint8 EcuM_GlobalState;
+uint8 EcuM_GlobalState = ECUM_NO_WAKEUP_SOURCE;
 /*****************************************
 *		END OF VARIABLES				 *
 ******************************************/
@@ -121,8 +123,8 @@ VOID EcuM_CheckForWakeupEvent()
 ************************************************************************************/
 VOID EcuM_SetWakeupSource(uint32 wakeupSource)
 {
-	/* If wake-up source is valid. */
-	if(wakeupSource != NULL_PTR)
+	/* POR is a valid source with value zero; NULL_PTR is not an event test. */
+	if(wakeupSource <= ECUM_WAKEUPSOURCE_LOWPOWER_RESET)
 	{
 		/* Store the wake-up event. */
 		EcuM_GlobalState = wakeupSource;
@@ -195,6 +197,7 @@ StdReturnType EcuM_DriverInit()
 	Watchdog_Init();
 	MX_NVIC_Init();
 	G26_BswInit();
+	EcuM_GlobalState = ECUM_NO_WAKEUP_SOURCE;
 	EcuM_BswState = ECUM_CHECKFORWAKEUP_STATE;
 	return E_OK;
 }
@@ -240,7 +243,8 @@ VOID EcuM_MainFunction()
 			break;
 		case ECUM_PROCESSWAKEUP_STATE:
 			EcuM_ProcessWakeupEvent();
-			EcuM_BswState = ECUM_CHECKFORWAKEUP_STATE;
+			/* RCC reset flags describe startup, not a periodic wake event. */
+			EcuM_BswState = ECUM_RUN_STATE;
 			break;
 		default:
 			break;

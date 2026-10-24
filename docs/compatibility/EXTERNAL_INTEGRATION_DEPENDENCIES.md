@@ -15,6 +15,7 @@ ZGW Com.c configures StatusBodyData1 at 24 ticks and NM3 at 20 ticks. NM3 is 0x3
 3. FCD.pyw DEFAULT_EXTENDED_DIAG_ADDRESSES currently lists ZGW/PDM1/HVDCDC/CBM/DMU/ELC/FRBE, without G26. Add a G26 target/address/bus profile and discoverable descriptor; reconcile any existing I4G26 display aliases.
 4. Configure APP vectors 0x08020200, APP maximum 261632 bytes, resident partition 64 KiB, erase/download address/length checks, IEEE CRC32 TransferExit and the G26 header/tag. APP download payload excludes the 512-byte header; the FBL creates it.
 5. APP-to-FBL sequence is extended session, programming request, persistence, confirmed positive response and reset mailbox. Resident RID 0x0155 is explicitly interlocked; SRAM then accepts a full validated replacement for 0x08000000. Recovery authorization is separate.
+   The current RepoCM5 FCD generic FBL path also sends RID 0x0200 before 0x0155. G26 has no RID 0x0200 and keeps 0x0155 disabled; a G26-specific FCD procedure and verified recovery path are required before resident-FBL replacement can be called compatible.
 6. Review actuator value enumerations before enabling G26_ENABLE_PROPOSED_BODY_COMMANDS. The existing DBC does not authorize bit values to drive G26 outputs.
 7. Review allocation/layout of proposed 0x241/DLC4 before enabling G26_ENABLE_PROPOSED_STATUS; add ZGW CanIf/PduR/COM and DBC reception if adopted. No current ZGW interpretation of this proposed status is claimed.
 

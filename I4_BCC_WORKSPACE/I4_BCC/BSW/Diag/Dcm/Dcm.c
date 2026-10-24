@@ -13,10 +13,10 @@ static uint8 request[CAPACITY],response[CAPACITY];
 static uint16 requestLength,responseLength,s3,pendingTimer;
 static uint8 requestReady,responseReady,inFlight,operation,operationSid,operationSub,pendingCount;
 static uint8 responsePending,resetAfterTx,suppressResponse;
-static uint8 longFlashPermitted;
+static uint8 longFlashPermitted,longFlashAwaiting,longFlashDenied;
 uint16 Dcm_DroppedRequests;
 void Dcm_Init(void) {
- longFlashPermitted=0;
+ longFlashPermitted=longFlashAwaiting=longFlashDenied=0;
  requestReady=responseReady=inFlight=operation=pendingCount=resetAfterTx=suppressResponse=0;
  requestLength=responseLength=s3=0; Dcm_DiagnosticSession=DEFAULT;
  Dcm_DroppedRequests=0;
@@ -127,7 +127,11 @@ static uint16 process(const uint8 *p,uint16 n) {
 void Dcm_TpTxConfirmation(uint8 success) {
  if(!inFlight) return;
  inFlight=0U;
- if(!success) { if(operation==3)(void)Dcm_AppPersist(DCM_CANCEL);operation=resetAfterTx=longFlashPermitted=0U; return; }
+ if(!success) {
+  if(longFlashAwaiting)longFlashDenied=1U;
+  if(operation==3)(void)Dcm_AppPersist(DCM_CANCEL);
+  operation=resetAfterTx=longFlashPermitted=0U; return;
+ }
  if(responsePending)longFlashPermitted=1;
  if(resetAfterTx && !responsePending) { uint8 session=resetAfterTx; resetAfterTx=0; Dcm_AppReset(session); }
 }
@@ -152,7 +156,11 @@ void Dcm_MainFunction(void) {
    }
    operation=0; pendingCount=0; responsePending=0; responseReady=1;
   } else if(pendingTimer && --pendingTimer==0) {
-   if(++pendingCount>20) { responseLength=negative(operationSid,0x72); operation=0; }
+   if(++pendingCount>20) {
+    responseLength=negative(operationSid,0x72);
+    if(longFlashAwaiting)longFlashDenied=1U;
+    operation=0;
+   }
    else responseLength=negative(operationSid,0x78);
    responsePending=1; responseReady=1; pendingTimer=DCM_P2STAR_TICKS;
   }
@@ -173,11 +181,16 @@ void Dcm_MainFunction(void) {
 
 uint8 Dcm_IsActive(void) { return operation || inFlight || responseReady || requestReady || Dcm_DiagnosticSession!=DEFAULT; }
 uint8 Dcm_PrepareLongFlashOperation(void){
+ if(longFlashDenied)return 2U; /* Abort the queued Fee erase and NvM job. */
  if(operation){
-  if(longFlashPermitted && !inFlight && !responseReady && !CanTp_IsBusy())return 1;
+  if(longFlashPermitted && !inFlight && !responseReady && !CanTp_IsBusy()){
+   longFlashAwaiting=0U;return 1U;
+  }
+  longFlashAwaiting=1U;
   /* Force NRC78 on the next scheduler call, then wait for actual CAN delivery. */
   if(!inFlight && !responseReady && pendingTimer>1)pendingTimer=1;
   return 0;
  }
+ if(longFlashAwaiting){longFlashDenied=1U;return 2U;}
  return !inFlight && !responseReady && !requestReady && !CanTp_IsBusy();
 }
